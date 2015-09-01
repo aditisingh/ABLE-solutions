@@ -65,10 +65,14 @@ Mat binary, label_image;
 // sprintf(p,"convert %s -units PixelsPerInch -density 300 input.jpg", argv[1]);
 // system(p);
 src=imread(argv[1]);
+char* cnt=argv[2];
 std::vector<cv::Rect> letterBBoxes=detectLetters(src);
 for(int i=0; i< letterBBoxes.size(); i++)
         cv::rectangle(src,letterBBoxes[i],cv::Scalar(0,255,0),3,8,0);
 imshow("boxes",src);  
+char name[25]="Output/";
+strcat(name,argv[2]);
+imwrite(name,src);
 Mat org;
 src.copyTo(org);
 Mat hsv;
