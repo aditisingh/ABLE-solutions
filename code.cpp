@@ -7,47 +7,56 @@
 // #include <tesseract/strngs.h>
 #include <string> 
 
+#define image_height 1836
+#define image_width 3264
+
  using namespace std;
  using namespace cv;
 
 //gamma correction
 
- std::vector<cv::Rect> detectLetters(cv::Mat img)
-{
-    std::vector<cv::Rect> boundRect;
-    cv::Mat img_gray, img_sobel, img_threshold, element;
-    cvtColor(img, img_gray, CV_BGR2GRAY);
-    cv::Sobel(img_gray, img_sobel, CV_8U, 1, 0, 3, 1, 0, cv::BORDER_DEFAULT);
-    cv::threshold(img_sobel, img_threshold, 0, 255, CV_THRESH_OTSU+CV_THRESH_BINARY);
-    element = getStructuringElement(cv::MORPH_RECT, cv::Size(17, 3) );
-    cv::morphologyEx(img_threshold, img_threshold, CV_MOP_CLOSE, element); //Does the trick
-    std::vector< std::vector< cv::Point> > contours;
-    cv::findContours(img_threshold, contours, 0, 1); 
-    std::vector<std::vector<cv::Point> > contours_poly( contours.size() );
-    for( int i = 0; i < contours.size(); i++ )
-        if (contours[i].size()>100)
-        { 
-            cv::approxPolyDP( cv::Mat(contours[i]), contours_poly[i], 3, true );
-            cv::Rect appRect( boundingRect( cv::Mat(contours_poly[i]) ));
-            if (appRect.width>appRect.height) 
-                boundRect.push_back(appRect);
-        }
-    return boundRect;
-}
+//  std::vector<cv::Rect> detectLetters(cv::Mat img)
+// {
+//     std::vector<cv::Rect> boundRect;
+//     cv::Mat img_gray, img_sobel, img_threshold, element;
+//     cvtColor(img, img_gray, CV_BGR2GRAY);
+//     imshow("img_gray",img_gray);
 
-Mat correctGamma( Mat& img, double gamma ) {
- double inverse_gamma = 1.0 / gamma;
+//     cv::Sobel(img_gray, img_sobel, CV_8U, 1, 0, 3, 1, 0, cv::BORDER_DEFAULT);
+//     imshow("img_sobel",img_sobel);
 
- Mat lut_matrix(1, 256, CV_8UC1 );
- uchar * ptr = lut_matrix.ptr();
- for( int i = 0; i < 256; i++ )
-   ptr[i] = (int)( pow( (double) i / 255.0, inverse_gamma ) * 255.0 );
+//     cv::threshold(img_sobel, img_threshold, 0, 255, CV_THRESH_OTSU+CV_THRESH_BINARY);
+//     imshow("img_threshold",img_threshold);
+    
+//     element = getStructuringElement(cv::MORPH_RECT, cv::Size(17, 3) );
+//     cv::morphologyEx(img_threshold, img_threshold, CV_MOP_CLOSE, element); //Does the trick
+//     std::vector< std::vector< cv::Point> > contours;
+//     cv::findContours(img_threshold, contours, 0, 1); 
+//     std::vector<std::vector<cv::Point> > contours_poly( contours.size() );
+//     for( int i = 0; i < contours.size(); i++ )
+//         if (contours[i].size()>100)
+//         { 
+//             cv::approxPolyDP( cv::Mat(contours[i]), contours_poly[i], 3, true );
+//             cv::Rect appRect( boundingRect( cv::Mat(contours_poly[i]) ));
+//             if (appRect.width>appRect.height) 
+//                 boundRect.push_back(appRect);
+//         }
+//     return boundRect;
+// }
 
- Mat result;
- LUT( img, lut_matrix, result );
+// Mat correctGamma( Mat& img, double gamma ) {
+//  double inverse_gamma = 1.0 / gamma;
 
- return result;
-}
+//  Mat lut_matrix(1, 256, CV_8UC1 );
+//  uchar * ptr = lut_matrix.ptr();
+//  for( int i = 0; i < 256; i++ )
+//    ptr[i] = (int)( pow( (double) i / 255.0, inverse_gamma ) * 255.0 );
+
+//  Mat result;
+//  LUT( img, lut_matrix, result );
+
+//  return result;
+// }
 
 int main( int argc, char** argv )
 {
@@ -55,6 +64,9 @@ clock_t t1,t2;
 t1=clock();
 
 // cvUseOptimized(true);
+
+double alpha;
+int beta;
 
 Mat src; 
 Mat gray;
@@ -65,63 +77,87 @@ Mat binary, label_image;
 // sprintf(p,"convert %s -units PixelsPerInch -density 300 input.jpg", argv[1]);
 // system(p);
 src=imread(argv[1]);
-char* cnt=argv[2];
-std::vector<cv::Rect> letterBBoxes=detectLetters(src);
-for(int i=0; i< letterBBoxes.size(); i++)
-        cv::rectangle(src,letterBBoxes[i],cv::Scalar(0,255,0),3,8,0);
-imshow("boxes",src);  
-char name[25]="Output/";
-strcat(name,argv[2]);
-imwrite(name,src);
+// resize(src,src,Size(src.cols/4,src.rows/4));
+std::cout<<" Basic Linear Transforms "<<std::endl;
+ std::cout<<"-------------------------"<<std::endl;
+ std::cout<<"* Enter the alpha value [1.0-3.0]: ";std::cin>>alpha;
+ std::cout<<"* Enter the beta value [0-100]: "; std::cin>>beta;
+ 
+imshow("input",src);
 Mat org;
 src.copyTo(org);
+Mat new_image = Mat::zeros( src.size(), src.type() );
+
+
+for( int y = 0; y < src.rows; y++ )
+   { for( int x = 0; x < src.cols; x++ )
+        { for( int c = 0; c < 3; c++ )
+             { new_image.at<Vec3b>(y,x)[c] =
+                         saturate_cast<uchar>( alpha*( src.at<Vec3b>(y,x)[c] ) + beta ); }
+   }
+   }
+
+char* cnt=argv[2];
+imshow("enhanced",new_image);
+// std::vector<cv::Rect> letterBBoxes=detectLetters(src);
+// for(int i=0; i< letterBBoxes.size(); i++)
+//         cv::rectangle(src,letterBBoxes[i],cv::Scalar(0,255,0),3,8,0);
+// imshow("boxes",src);  
+// char name[25]="Output/";
+// strcat(name,argv[2]);
+// imwrite(name,src);
+
 Mat hsv;
 //imshow("input",org);
 
-//improving contrast
+//improving contrast 
+//not very great improvements, but noise also added
+/*
 for(int x_coor=0;x_coor<src.cols;x_coor++) {
      for(int y_coor=0;y_coor<src.rows;y_coor++) {
-         if(src.at<Vec3b>(y_coor,x_coor)[0]>180 && src.at<Vec3b>(y_coor,x_coor)[1]>180 && src.at<Vec3b>(y_coor,x_coor)[2]>180)
-         	              src.at<Vec3b>(y_coor,x_coor)[1]=255,src.at<Vec3b>(y_coor,x_coor)[2]=255, src.at<Vec3b>(y_coor,x_coor)[0]=255;
+         if(org.at<Vec3b>(y_coor,x_coor)[0]>180 && org.at<Vec3b>(y_coor,x_coor)[1]>180 && org.at<Vec3b>(y_coor,x_coor)[2]>180)
+         	              org.at<Vec3b>(y_coor,x_coor)[1]=255,org.at<Vec3b>(y_coor,x_coor)[2]=255, org.at<Vec3b>(y_coor,x_coor)[0]=255;
 
-         if(src.at<Vec3b>(y_coor,x_coor)[0]<50 && src.at<Vec3b>(y_coor,x_coor)[1] <50 && src.at<Vec3b>(y_coor,x_coor)[2] <50)
-              src.at<Vec3b>(y_coor,x_coor)[1]=0,src.at<Vec3b>(y_coor,x_coor)[2]=0, src.at<Vec3b>(y_coor,x_coor)[0]=0;
+         if(org.at<Vec3b>(y_coor,x_coor)[0]<50 && org.at<Vec3b>(y_coor,x_coor)[1] <50 && org.at<Vec3b>(y_coor,x_coor)[2] <50)
+              org.at<Vec3b>(y_coor,x_coor)[1]=0,org.at<Vec3b>(y_coor,x_coor)[2]=0, org.at<Vec3b>(y_coor,x_coor)[0]=0;
      }
  }
-//imshow("increased contrast",src);
-
-// cvtColor(src,hsv,CV_BGR2HSV);	
-
-// Mat conv;
-
-Mat kernel = Mat::ones(Size(2,2), CV_8U);
-Mat kernel_b = Mat::ones(Size(3,3), CV_8U);
-Mat kernel_s = Mat::ones(Size(1,1), CV_8U);
-Mat hist_gray, new_gray;
-// cvtColor(hsv,conv,CV_HSV2BGR);
-//char s[100];
-cvtColor(src,gray,CV_BGR2GRAY);
-//imshow("gray",gray);
-gray=correctGamma(gray,1.5);
-//imshow("gamma_correct",gray);
-/*
-erode(gray,gray,kernel);
-imshow("erode_gray",gray);
-Mat binary2;
-// equalizeHist(gray,hist_gray);
-// imshow("hist_gray",hist_gray);
-threshold(gray,binary2,90,255,THRESH_BINARY);  //earlier was 70
-char d[100];
-
-imshow("new",binary2);
-sprintf(d, "outputnew%s", argv[1]);
-imwrite(d,binary2);
-// medianBlur(binary2,binary2,1);
-erode(binary2,binary2,kernel);
-dilate(binary2,binary2,kernel);
-imshow("dilate",binary2);
-cv::threshold(binary2, binary2, 0, 255, CV_THRESH_BINARY_INV|CV_THRESH_OTSU);   
+ imshow("improved_contrast",org);
+ std::vector<cv::Rect> letterBBoxes_1=detectLetters(org);
+for(int i=0; i< letterBBoxes_1.size(); i++)
+        cv::rectangle(org,letterBBoxes_1[i],cv::Scalar(255,0,0),3,8,0);
+ imshow("boxes_new",org);
 */
+
+
+// Mat kernel = Mat::ones(Size(2,2), CV_8U);
+// Mat kernel_b = Mat::ones(Size(3,3), CV_8U);
+// Mat kernel_s = Mat::ones(Size(1,1), CV_8U);
+Mat hist_gray, new_gray;
+// // cvtColor(hsv,conv,CV_HSV2BGR);
+// //char s[100];
+cvtColor(src,gray,CV_BGR2GRAY);
+// imshow("gray",gray);
+// gray=correctGamma(gray,1.5);
+//imshow("gamma_correct",gray);
+
+// erode(gray,gray,kernel);
+// imshow("erode_gray",gray);
+// Mat binary2;
+equalizeHist(gray,hist_gray);
+// imshow("hist_gray",hist_gray);
+// threshold(gray,binary2,90,255,THRESH_BINARY);  //earlier was 70
+// char d[100];
+
+// imshow("new",binary2);
+// sprintf(d, "outputnew%s", argv[1]);
+// imwrite(d,binary2);
+// medianBlur(binary2,binary2,1);
+// erode(binary2,binary2,kernel);
+// dilate(binary2,binary2,kernel);
+// imshow("dilate",binary2);
+// cv::threshold(binary2, binary2, 0, 255, CV_THRESH_BINARY_INV|CV_THRESH_OTSU);   
+
 // cv::threshold(hist_gray, binary, 0, 255, CV_THRESH_BINARY_INV|CV_THRESH_OTSU);   
 // imshow("thresholding",binary);
 // //do small dilation to strengthen if weak symbols
