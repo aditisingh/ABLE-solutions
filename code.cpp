@@ -7,13 +7,18 @@
 // #include <tesseract/strngs.h>
 #include <string> 
 
-#define image_height 1836
-#define image_width 3264
+// #define image_height 1836
+// #define image_width 3264
 
  using namespace std;
  using namespace cv;
 
-//gamma correction
+RNG rng(12345);
+
+float dist(int x1, int x2, int y1, int y2)
+{
+  return sqrt((x1-x2)*(x1-x2)+(y1-y2)*(y1-y2));
+}
 
 //  std::vector<cv::Rect> detectLetters(cv::Mat img)
 // {
@@ -78,27 +83,27 @@ Mat binary, label_image;
 // system(p);
 src=imread(argv[1]);
 // resize(src,src,Size(src.cols/4,src.rows/4));
-std::cout<<" Basic Linear Transforms "<<std::endl;
- std::cout<<"-------------------------"<<std::endl;
- std::cout<<"* Enter the alpha value [1.0-3.0]: ";std::cin>>alpha;
- std::cout<<"* Enter the beta value [0-100]: "; std::cin>>beta;
- 
+// std::cout<<" Basic Linear Transforms "<<std::endl;
+//  std::cout<<"-------------------------"<<std::endl;
+//  std::cout<<"* Enter the alpha value [1.0-3.0]: ";std::cin>>alpha;
+//  std::cout<<"* Enter the beta value [0-100]: "; std::cin>>beta;
+ namedWindow("input",CV_WINDOW_NORMAL);
 imshow("input",src);
 Mat org;
 src.copyTo(org);
 Mat new_image = Mat::zeros( src.size(), src.type() );
 
 
-for( int y = 0; y < src.rows; y++ )
-   { for( int x = 0; x < src.cols; x++ )
-        { for( int c = 0; c < 3; c++ )
-             { new_image.at<Vec3b>(y,x)[c] =
-                         saturate_cast<uchar>( alpha*( src.at<Vec3b>(y,x)[c] ) + beta ); }
-   }
-   }
+// for( int y = 0; y < src.rows; y++ )
+//    { for( int x = 0; x < src.cols; x++ )
+//         { for( int c = 0; c < 3; c++ )
+//              { new_image.at<Vec3b>(y,x)[c] =
+//                          saturate_cast<uchar>( alpha*( src.at<Vec3b>(y,x)[c] ) + beta ); }
+//    }
+//    }
 
-char* cnt=argv[2];
-imshow("enhanced",new_image);
+// char* cnt=argv[2];
+// imshow("enhanced",new_image);
 // std::vector<cv::Rect> letterBBoxes=detectLetters(src);
 // for(int i=0; i< letterBBoxes.size(); i++)
 //         cv::rectangle(src,letterBBoxes[i],cv::Scalar(0,255,0),3,8,0);
@@ -107,7 +112,7 @@ imshow("enhanced",new_image);
 // strcat(name,argv[2]);
 // imwrite(name,src);
 
-Mat hsv;
+// Mat hsv;
 //imshow("input",org);
 
 //improving contrast 
@@ -133,217 +138,186 @@ for(int i=0; i< letterBBoxes_1.size(); i++)
 // Mat kernel = Mat::ones(Size(2,2), CV_8U);
 // Mat kernel_b = Mat::ones(Size(3,3), CV_8U);
 // Mat kernel_s = Mat::ones(Size(1,1), CV_8U);
-Mat hist_gray, new_gray;
+// Mat hist_gray, new_gray;
 // // cvtColor(hsv,conv,CV_HSV2BGR);
 // //char s[100];
 cvtColor(src,gray,CV_BGR2GRAY);
-// imshow("gray",gray);
-// gray=correctGamma(gray,1.5);
-//imshow("gamma_correct",gray);
+namedWindow("gray",CV_WINDOW_NORMAL);
+imshow("gray",gray);
 
-// erode(gray,gray,kernel);
-// imshow("erode_gray",gray);
-// Mat binary2;
-equalizeHist(gray,hist_gray);
-// imshow("hist_gray",hist_gray);
-// threshold(gray,binary2,90,255,THRESH_BINARY);  //earlier was 70
-// char d[100];
+//blurring
+GaussianBlur(gray,gray,Size(3,3),0,0);
+namedWindow("blurred",CV_WINDOW_NORMAL);
+imshow("blurred",gray);
+//detecting edges
+int ratio=3, kernel_size=3;
+int lowThreshold=20;
 
-// imshow("new",binary2);
-// sprintf(d, "outputnew%s", argv[1]);
-// imwrite(d,binary2);
-// medianBlur(binary2,binary2,1);
-// erode(binary2,binary2,kernel);
-// dilate(binary2,binary2,kernel);
-// imshow("dilate",binary2);
-// cv::threshold(binary2, binary2, 0, 255, CV_THRESH_BINARY_INV|CV_THRESH_OTSU);   
+int scale = 1;
+int delta = 0;
+int ddepth = CV_16S;
+// Mat detected_edges;
+// cv::threshold(gray, detected_edges, 0, 255, CV_THRESH_BINARY | CV_THRESH_OTSU);
+Mat grad_x, grad_y;
+Mat abs_grad_x, abs_grad_y,grad;
 
-// cv::threshold(hist_gray, binary, 0, 255, CV_THRESH_BINARY_INV|CV_THRESH_OTSU);   
-// imshow("thresholding",binary);
-// //do small dilation to strengthen if weak symbols
+/// Gradient X
+Sobel( gray, grad_x, ddepth, 1, 0, 3, scale, delta, BORDER_DEFAULT );
+/// Gradient Y
+Sobel( gray, grad_y, ddepth, 0, 1, 3, scale, delta, BORDER_DEFAULT );
 
-// medianBlur(binary,binary,1);    //3 was good
-// imshow("removing salt and pepper noise",binary);
-// //thresholding followed by median blur to remove salt and pepper noise
-// Mat binaryD,binaryM,binaryD4;
+convertScaleAbs( grad_x, abs_grad_x );
+convertScaleAbs( grad_y, abs_grad_y );
+addWeighted( abs_grad_x, 0.5, abs_grad_y, 0.5, 0, grad );
 
-// //first do opening to remove small objects from foreground
-// erode(binary,binary,kernel_s);
-// dilate(binary,binary,kernel_s);
-// imshow("opening",binary);
-// dilate(binary,binary,kernel_s);
-// erode(binary, binaryD,kernel_s);
-// imshow("closing result",binaryD);
-// medianBlur(binaryD,binaryM,1);
-// imshow("binary_after_median_blur",binaryM);
+namedWindow("sobel",CV_WINDOW_NORMAL);
+imshow("sobel",grad);
 
-// Mat binary2=cv::Scalar::all(255)-binaryM;
-// dilate(binary2, binary2,kernel_s);
-// imshow("dilate inverted binary",binary2);
+cv::threshold(grad, grad, 0, 255, CV_THRESH_BINARY | CV_THRESH_OTSU);
+namedWindow("grad binary",CV_WINDOW_NORMAL);
+imshow("grad binary",grad);
+// 
+double largest_area=0;
+int largest_contour_index=0;
+//now detect contours
+vector<vector<Point> > contours;
+vector<Vec4i> hierarchy;
+findContours( grad, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0, 0) );
 
-// Mat kernel4=Mat::ones(Size(2,6),CV_8U); 
+//   /// Draw contours
+  Mat drawing = Mat::zeros( grad.size(), CV_8UC3 );
+  Point p_r,p_l,p_t,p_b;
+  for( int i = 0; i< contours.size(); i++ )
+     {
+       double a=contourArea( contours[i],false);  //  Find the area of contour
+       if(a>largest_area){
+       largest_area=a;
+       largest_contour_index=i;                //Store the index of largest contour
+       // bounding_rect=boundingRect(contours[i]); // Find the bounding rectangle for biggest contour
+       }
+     }
+// 
+  p_r.x=p_l.x=p_t.x=p_b.x=contours[largest_contour_index][1].x;
+  p_r.y=p_l.y=p_t.y=p_b.y=contours[largest_contour_index][1].y;
 
-// vector < vector<cv::Point>  > blobs;
-//             blobs.clear();
+  vector<Point> contours_poly;
+  Rect boundRect;
+  /// Show in a window
+  // Scalar color = Scalar( rng.uniform(0, 255), rng.uniform(0,255), rng.uniform(0,255) );
+  approxPolyDP(contours[largest_contour_index], contours_poly, 3, true);
+  boundRect = boundingRect( contours_poly );
+  drawContours( drawing, contours, largest_contour_index,Scalar(0,0,255), 1, 8, vector<Vec4i>(), 0, Point() );
 
-//             // Fill the label_image with the blobs
-//             // 0  - background
-//             // 1  - unlabelled foreground
-//             // 2+ - labelled foreground
-
-//             ///input is a binary image therefore values are either 0 or 1
-//             ///out objective is to find a set of 1's that are together and assign 2 to it
-//             ///then look for other 1's, and assign 3 to it....so on a soforth
-
-//             binary2.convertTo(label_image, CV_32FC1); // weird it doesn't support CV_32S! Because the CV::SCALAR is a double value in the function floodfill
-
-//             int label_count = 2; // starts at 2 because 0,1 are used already
-
-//             //erode to remove noise-------------------------------
-//             Mat element = getStructuringElement( MORPH_RECT,
-//             Size( 2*3 + 1, 2*3+1 ),
-//             Point( 0, 0 ) );
-//             /// Apply the erosion operation
-//             //erode( label_image, label_image, element );
-//             //---------------------------------------------------
-
-//             //just check the Matrix of label_image to make sure we have 0 and 1 only
-//             //cout << label_image << endl;
-
-//             for(int y=0; y < binary2.rows; y++) {
-//                 for(int x=0; x < binary2.cols; x++) {
-//                     float checker = label_image.at<float>(y,x); //need to look for float and not int as the scalar value is of type double
-//                     cv::Rect rect;
-//                     //cout << "check:" << checker << endl;
-//                     if(checker ==255) {
-//                         //fill region from a point
-//                         cv::floodFill(label_image, cv::Point(x,y), cv::Scalar(label_count), &rect, cv::Scalar(0), cv::Scalar(0), 4);
-//                         label_count++;
-//                         //cout << label_image << endl <<"by checking: " << label_image.at<float>(y,x) <<endl;
-//                         //cout << label_image;
-
-//                         //a vector of all points in a blob
-//                         std::vector<cv::Point> blob;
-
-//                         for(int i=rect.y; i < (rect.y+rect.height); i++) {
-//                             for(int j=rect.x; j < (rect.x+rect.width); j++) {
-//                                 float chk = label_image.at<float>(i,j);
-//                                 //cout << chk << endl;
-//                                 if(chk == label_count-1) {
-//                                     blob.push_back(cv::Point(j,i));
-//                                 }                       
-//                             }
-//                         }
-//                         //place the points of a single blob in a grouping
-//                         //a vector of vector points
-//                         blobs.push_back(blob);
-//                     }
-//                 }
-//             }
+  rectangle(drawing,boundRect.tl(),boundRect.br(),Scalar(255,0,0),1,8,0);
+  
 
 
-// char a[100];
-// Mat img;
-// imshow("label_image",label_image);
-// sprintf(a, "outputlabel%s", argv[1]);
-// imwrite(a,label_image);
-// int val[20]={0};
-// int val_y[20]={0};
-// int H=src.rows;
-// int W=src.cols;
+//find the points to be transformed
+for(vector<Point>::iterator it=contours[largest_contour_index].begin();it!=contours[largest_contour_index].end();++it)
+{
+  if((*it).x>=p_l.x)
+    {
+      p_l.x=(*it).x;
+      p_l.y=(*it).y;
+    }
+    if((*it).x<=p_r.x)
+    {
+      p_r.x=(*it).x;
+      p_r.y=(*it).y;
+    }
+    if((*it).y>=p_b.y)
+    {
+      p_b.x=(*it).x;
+      p_b.y=(*it).y;
+    }
+    if((*it).y<=p_t.y)
+    {
+      p_t.x=(*it).x;
+      p_t.y=(*it).y;
+    }
+}
 
-// vector<Rect> boundRect(blobs.size());
-// // int k = 0;
+// cout<<p_b<<endl<<p_t<<endl<<p_r<<endl<<p_l<<endl; //these can be improved by more constraints, but shud be??
+// circle(drawing,p_b,2,Scalar(0,255,255),1,8,0);
+// circle(drawing,p_l,2,Scalar(0,255,255),1,8,0);
+// circle(drawing,p_r,2,Scalar(0,255,255),1,8,0);
+// circle(drawing,p_t,2,Scalar(0,255,255),1,8,0);
 
-// // Point p1,p2;
-// // int x1,y1,x,y;
 
-// // // Finding frequency of each height
-// // for (size_t i = 0; i < blobs.size(); i++) {
-// //     boundRect[i]=boundingRect(Mat( blobs[i]));
-//     p1=boundRect[i].tl();
-//     p2=boundRect[i].br();
-//     x1=p1.x;
-//     y1=p1.y;
-//     x=-x1+p2.x;
-//     y=-y1+p2.y;
+cout<<boundRect.tl()<<endl;
+cout<<boundRect.br()<<endl;
 
-//     // Kamina hardcode
-//     if(y>H/32 && (y>=x) && ((x>0 && y>0))) {   
-//         rectangle(org,p1,p2,Scalar(0,0,255),2,8,0);
-//         // Frequency of height
-//         val[(20*y)/H]++;
-//         // Frequency of y position
-//         val_y[(y1*20)/H]++;
+Point r_b,r_t,r_r,r_l;
 
-//     }
-// }
-// imwrite("red_rec.jpg",org);
+r_t.x=boundRect.br().x,r_t.y=boundRect.tl().y;
+r_r.x=boundRect.br().x,r_r.y=boundRect.br().y;
+r_b.x=boundRect.tl().x,r_b.y=boundRect.br().y;
+r_l.x=boundRect.tl().x,r_l.y=boundRect.tl().y;
 
-// int max_val=0;
-// int max_val_idx=0;
-// int max_y_idx=0;
-// int max_y=0;
-// // Calculating maximum of height and Frequency position
-// for(int i=0;i<20;i++) {
-//     if(val_y[i]>max_y)
-//     {
-//         max_y=val_y[i];
-//         max_y_idx=i;
-//     }
-//     if(val[i]>max_val) {
-//         max_val=val[i];
-//         max_val_idx=i;
-//     }
-// }
+vector<Point> initial;
+vector<Point> final;
 
-// // Remove connected numbbers
-// dilate(binary2,binary2,kernel_s);
+circle(drawing,r_t,2,Scalar(0,255,255),1,8,0);
 
-// // Inverted again/ Why???????????
-// cv::threshold(label_image,label_image, 0, 255, CV_THRESH_BINARY_INV);
-// imwrite("label_image.jpg", label_image);
-// char b[100];
-// for (size_t i = 0; i < blobs.size(); i++) {
-//     boundRect[i]=boundingRect(Mat( blobs[i]));
-//     Point p1=boundRect[i].tl();
-//     Point p2=boundRect[i].br();
+namedWindow( "Contours", CV_WINDOW_NORMAL);
+imshow( "Contours", drawing );
 
-//     int x1=p1.x;
-//     int y1=p1.y;
-//     int x=abs(x1-p2.x);
-//     int y=abs(y1-p2.y);
-    
-//     // ALready did this?? Fuckers
-//     if(y>H/32 && (y>=x)&&(x>0 && y>0))
-//     {
-//         if( y/x<=4 && abs((20*y)/H-max_val_idx)<=1 && abs((y1*20)/H-max_y_idx)<=1)// && x*y>=H/2 && x*y<=15*H/2 )
-//         {  
-//             if(x1+x+4>W || y1+y+4>H  || x1<2 || y1<2) {
-//                img=binary2(Rect(x1,y1,x,y));
-//            } else {
-//                img=binary2(Rect(x1-1, y1-1, x+2,y+2));
-//            }
+initial.push_back(p_t);
+initial.push_back(p_l);
+initial.push_back(p_b);
+initial.push_back(p_r);
 
-//            rectangle(org,p1,p2,Scalar(0,255,0),2,8,0);
-//            // cout<<"area="<<x*y<<endl;
-//            sprintf(b, "roi%d.tif", k);
-//           imwrite(b,img);
-//             // sprintf(c, "convert -units PixelsPerInch roi%d.tiff -density 600 output%d.tiff", k, k);
-//             // popen(c,"r");
-//            sprintf(b, "tesseract roi%d.tif -psm 10 out%d num_plate",k,k);
-//             popen(b,"r");
-//             k++;
-//         }
-//     }
-// }
- 
- // imshow("Final Image", org);
- // sprintf(b, "output2%s", argv[1]);
+Rect ROI(boundRect.tl().x,boundRect.tl().y,abs(boundRect.br().x-boundRect.tl().x),abs(boundRect.br().y-boundRect.tl().y));
+float d1=dist(p_t.x,p_r.x,p_t.y,p_r.y);
+float d2=dist(p_r.x,p_b.x,p_r.y,p_b.y);
 
- // cout<<b;    
- // imwrite(b,org);
-// imshow("src",src);
+float d3=dist(r_t.x,r_r.x,r_t.y,r_r.y);
+float d4=dist(r_r.x,r_b.x,r_r.y,r_b.y);
+
+cout<<float(d3/d4)<<endl<<float(d1/d2)<<endl;
+
+int ratio1=d3/d4;
+int ratio2=d1/d2;
+
+
+if(ratio2==ratio1)
+{
+final.push_back(r_t);
+final.push_back(r_l);
+final.push_back(r_b);
+final.push_back(r_r);
+}
+else
+{
+final.push_back(r_t);
+final.push_back(r_r);
+final.push_back(r_b);
+final.push_back(r_l);
+}
+
+Mat im_transformed;
+im_transformed=src;
+
+Mat H=findHomography(initial,final);
+warpPerspective(src,im_transformed,H,im_transformed.size());
+
+namedWindow( "transformed", CV_WINDOW_NORMAL);
+imshow( "transformed", im_transformed );
+
+// cout<<endl<<boundRect.br().x-boundRect.tl().x;
+Mat cropped;
+im_transformed(ROI).copyTo(cropped);
+// cout<<ROI.size()<<endl;
+// Mat cropped=im_transformed(Rect(boundRect.tl().x,boundRect.tl().y,abs(boundRect.br().x-boundRect.tl().x),abs(boundRect.br().y-boundRect.br().y)));
+// Mat cropped;
+// cout<<endl<<boundRect.br().x-boundRect.tl().x;
+// croppedref.copyTo(cropped);
+// cout<<cropped;
+namedWindow("cropped",CV_WINDOW_NORMAL);
+imshow("cropped",cropped);
+
+cout<<"here"<<endl;
+//
 t2=clock();
 cout<<"time"<<((float)(t2-t1))/CLOCKS_PER_SEC;
 cvWaitKey();
