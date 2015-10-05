@@ -254,8 +254,8 @@ r_r.x=boundRect.br().x,r_r.y=boundRect.br().y;
 r_b.x=boundRect.tl().x,r_b.y=boundRect.br().y;
 r_l.x=boundRect.tl().x,r_l.y=boundRect.tl().y;
 
-vector<Point> initial;
-vector<Point> final;
+vector<Point2f> initial;
+vector<Point2f> final;
 
 circle(drawing,p_t,2,Scalar(0,255,255),1,8,0);
 circle(drawing,p_r,2,Scalar(255,255,255),1,8,0);

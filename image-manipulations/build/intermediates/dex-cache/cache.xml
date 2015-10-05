@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<items version="2" >
+
+    <item
+        jar="/home/kunal/StudioProjects/image-manipulations/openCVSampleimagemanipulations/build/intermediates/exploded-aar/image-manipulations/openCVLibrary300/unspecified/jars/classes.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="95d5a76d46ceb347d63ab066a9ba916f7cfe05dd">
+        <dex dex="/home/kunal/StudioProjects/image-manipulations/openCVSampleimagemanipulations/build/intermediates/pre-dexed/debug/classes-4347570a98ca511b9a397408050ae896ebe7a82b.jar" />
+    </item>
+
+</items>
