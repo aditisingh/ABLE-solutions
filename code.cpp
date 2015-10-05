@@ -257,10 +257,12 @@ r_l.x=boundRect.tl().x,r_l.y=boundRect.tl().y;
 vector<Point> initial;
 vector<Point> final;
 
-circle(drawing,r_t,2,Scalar(0,255,255),1,8,0);
+circle(drawing,p_t,2,Scalar(0,255,255),1,8,0);
+circle(drawing,p_r,2,Scalar(255,255,255),1,8,0);
+circle(drawing,p_b,2,Scalar(0,255,0),1,8,0);
+circle(drawing,p_l,2,Scalar(255,255,0),1,8,0);
 
-namedWindow( "Contours", CV_WINDOW_NORMAL);
-imshow( "Contours", drawing );
+
 
 initial.push_back(p_t);
 initial.push_back(p_l);
@@ -279,6 +281,7 @@ cout<<float(d3/d4)<<endl<<float(d1/d2)<<endl;
 int ratio1=d3/d4;
 int ratio2=d1/d2;
 
+cout<<ratio1<<endl<<ratio2<<endl;
 
 if(ratio2==ratio1)
 {
@@ -286,6 +289,12 @@ final.push_back(r_t);
 final.push_back(r_l);
 final.push_back(r_b);
 final.push_back(r_r);
+
+circle(drawing,r_t,2,Scalar(0,255,255),1,8,0);
+circle(drawing,r_r,2,Scalar(255,255,255),1,8,0);
+circle(drawing,r_b,2,Scalar(0,255,0),1,8,0);
+circle(drawing,r_l,2,Scalar(255,255,0),1,8,0);
+
 }
 else
 {
@@ -293,7 +302,15 @@ final.push_back(r_t);
 final.push_back(r_r);
 final.push_back(r_b);
 final.push_back(r_l);
+
+circle(drawing,r_t,2,Scalar(0,255,255),1,8,0);
+circle(drawing,r_l,2,Scalar(255,255,255),1,8,0);
+circle(drawing,r_b,2,Scalar(0,255,0),1,8,0);
+circle(drawing,r_r,2,Scalar(255,255,0),1,8,0);
+
 }
+namedWindow( "Contours", CV_WINDOW_NORMAL);
+imshow( "Contours", drawing );
 
 Mat im_transformed;
 im_transformed=src;
@@ -316,7 +333,15 @@ im_transformed(ROI).copyTo(cropped);
 namedWindow("cropped",CV_WINDOW_NORMAL);
 imshow("cropped",cropped);
 
-cout<<"here"<<endl;
+Mat res;
+
+Mat cropped_gray;
+cvtColor(cropped,cropped_gray,CV_RGB2GRAY);
+threshold(cropped_gray,res, 0, 255, CV_THRESH_BINARY | CV_THRESH_OTSU);
+
+namedWindow("result",CV_WINDOW_NORMAL);
+imshow("result",res);
+// cout<<"here"<<endl;
 //
 t2=clock();
 cout<<"time"<<((float)(t2-t1))/CLOCKS_PER_SEC;
