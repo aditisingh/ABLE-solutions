@@ -212,13 +212,16 @@ public class ImageManipulationsActivity extends Activity implements CvCameraView
         Mat rgba = inputFrame.rgba();
         Size sizeRgba = rgba.size();
 
-        int rows = (int) sizeRgba.height;
-        int cols = (int) sizeRgba.width;
+        int rows = (int) sizeRgba.height;//=720
+        int cols = (int) sizeRgba.width;//=1280
 
         Mat gray = new Mat();
         Size blur_size= new Size(3, 3);
+
+        Mat imageMat=new Mat();
         Imgproc.cvtColor(rgba, gray, Imgproc.COLOR_BGR2GRAY);
         Imgproc.GaussianBlur(gray, gray, blur_size, 0, 0);
+        Imgproc.adaptiveThreshold(gray, imageMat, 255, Imgproc.ADAPTIVE_THRESH_MEAN_C, Imgproc.THRESH_BINARY_INV, 5, 4);
 
         int ratio=3, kernel_size=3;
         int lowThreshold=20;
@@ -234,6 +237,7 @@ public class ImageManipulationsActivity extends Activity implements CvCameraView
 
         /// Gradient X
         Imgproc.Sobel(gray, grad_x, ddepth, 1, 0, 3, scale, delta, Core.BORDER_DEFAULT);
+
         /// Gradient Y
         Imgproc.Sobel(gray, grad_y, ddepth, 0, 1, 3, scale, delta, Core.BORDER_DEFAULT);
 
@@ -247,11 +251,15 @@ public class ImageManipulationsActivity extends Activity implements CvCameraView
         Mat hierarchy = new Mat();
         ArrayList<MatOfPoint> contours = new ArrayList<MatOfPoint>();
         Point p = new Point(0, 0);
-        Imgproc.findContours(grad, contours, hierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE, p );
+        Imgproc.findContours(imageMat, contours, hierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE, p );
 
-        Mat drawing = Mat.zeros( grad.size(), CvType.CV_8UC3 );
+        Mat drawing = Mat.zeros( imageMat.size(), CvType.CV_8UC3 );
         Point p_r, p_l, p_t, p_b;
-        p_r = p_l = p_b = p_t = new Point(0, 0);
+        p_r = new Point(0, 0);
+        p_l = new Point(0, 0);
+        p_b = new Point(0, 0);
+        p_t = new Point(0, 0);
+
         for( int i = 0; i< contours.size(); i++ )
         {
             double a=Imgproc.contourArea( contours.get(i), false );  //  Find the area of contour
@@ -262,10 +270,9 @@ public class ImageManipulationsActivity extends Activity implements CvCameraView
             }
         }
 
-//        TODO Not sure whether X is [1] or [0]
-//        Please confirm and fix
         p_r.x=p_l.x=p_t.x=p_b.x = contours.get(largest_contour_index).get(1, 0)[0];
         p_r.y=p_l.y=p_t.y=p_b.y = contours.get(largest_contour_index).get(1, 0)[1];
+
 
         MatOfPoint2f contours_poly = new MatOfPoint2f();
         MatOfPoint2f MOP2M2f = new MatOfPoint2f();
@@ -278,23 +285,32 @@ public class ImageManipulationsActivity extends Activity implements CvCameraView
         contours_poly.convertTo(MOP2f2M, CvType.CV_32S);
         Rect boundRect = Imgproc.boundingRect( MOP2f2M );
 
-        Scalar color = new Scalar(0, 255, 255);
+        Scalar color = new Scalar(0, 0, 255);
         Scalar color1 = new Scalar(255, 0, 0);
+        Log.d("left","X"+p_l.x+"Y"+p_l.y);
+        Log.d("right","X"+p_r.x+"Y"+p_r.y);
+        Log.d("top","X"+p_t.x+"Y"+p_t.y);
+        Log.d("bottom","X"+p_b.x+"Y"+p_b.y);
 
-        Imgproc.drawContours(rgba, contours, largest_contour_index, color, 1, 8, hierarchy, 0, new Point(0, 0) );
-        Imgproc.rectangle(drawing, boundRect.tl(), boundRect.br(), color1, 1, 8, 0);
-
-// TODO Same as above
+       // Imgproc.drawContours(rgba, contours, largest_contour_index, color, 1, 8, hierarchy, 0, new Point(0, 0) );
+        Imgproc.rectangle(rgba, boundRect.tl(), boundRect.br(), color1, 1, 8, 0);
+        int row_c=contours.get(largest_contour_index).rows();
+        int col_c=contours.get(largest_contour_index).cols();
+        Log.d("contour row","row"+row_c);
+        Log.d("contour col","col"+col_c);
         for( int i=0; i<contours.get(largest_contour_index).rows() ; i++) {
             double y = contours.get(largest_contour_index).get(i,0)[1];
             double x = contours.get(largest_contour_index).get(i,0)[0];
-            Log.d("Row no", "Row "+(i));
+            //Log.d("Row no", "Row "+(i));
             Log.d("XY", "X "+x+" Y "+y);
-
-            if(x>=p_l.x) {
+            Log.d("left","X"+p_l.x+"Y"+p_l.y);
+            Log.d("right","X"+p_r.x+"Y"+p_r.y);
+            Log.d("top","X"+p_t.x+"Y"+p_t.y);
+            Log.d("bottom","X"+p_b.x+"Y"+p_b.y);
+            if(x<=p_l.x) {
                 p_l.x=x;
                 p_l.y=y;
-            } else if(x<=p_r.x) {
+            } else if(x>=p_r.x) {
                 p_r.x=x;
                 p_r.y=y;
             } else if(y>=p_b.y) {
@@ -307,16 +323,21 @@ public class ImageManipulationsActivity extends Activity implements CvCameraView
         }
 
         Scalar color2 = new Scalar(0, 255, 255);
-        Imgproc.circle(drawing, p_b, 2, color2, 1, 8, 0);
-        Imgproc.circle(drawing, p_l, 2, color2, 1, 8, 0);
-        Imgproc.circle(drawing, p_r, 2, color2, 1, 8, 0);
-        Imgproc.circle(drawing, p_t, 2, color2, 1, 8, 0);
-
-//        cout<<boundRect.tl()<<endl;
-//        cout<<boundRect.br()<<endl;
-//
+        Scalar color_r = new Scalar(255,0,0);
+        Scalar color_g= new Scalar(0,255,0);
+        Scalar color_w=new Scalar(255,255,255);
+        Scalar color_b=new Scalar(0,0,255);
+        Imgproc.circle(rgba, p_b, 10, color_w, 1, 8, 0);
+        Imgproc.circle(rgba, p_l, 10, color_r, 1, 8, 0);
+        Imgproc.circle(rgba, p_r, 10, color_g, 1, 8, 0);
+        Imgproc.circle(rgba, p_t, 10, color_b , 1, 8, 0);
+//+++++++++++
         Point r_b,r_t,r_r,r_l;
-        r_b = r_t = r_r = r_l = new Point();
+        r_b = new Point();
+        r_t = new Point();
+        r_r = new Point();
+        r_l = new Point();
+
         r_t.x = boundRect.br().x;
         r_t.y=boundRect.tl().y;
 
@@ -340,6 +361,7 @@ public class ImageManipulationsActivity extends Activity implements CvCameraView
         int ratio1 = (int)(d3/d4);
         int ratio2 = (int)(d1/d2);
 
+        Log.d("ADebugTag", "Value: " + Double.toString(ratio1));
 //      TODO Change this to an approximate ratio, int is an approximation, but still more approximate like
 //      abs(ratio2-ratio1)<=2 or something
         java.util.ArrayList<Point> lp = new java.util.ArrayList<Point>(4);
@@ -354,13 +376,50 @@ public class ImageManipulationsActivity extends Activity implements CvCameraView
             lp.add(2, r_b);
             lp.add(3, r_l);
         }
+
+        Imgproc.circle(rgba, r_b, 10, color, 1, 8, 0);
+        Imgproc.circle(rgba, r_l, 10, color, 1, 8, 0);
+        Imgproc.circle(rgba, r_r, 10, color, 1, 8, 0);
+        Imgproc.circle(rgba, r_t, 10, color, 1, 8, 0);
+
         MatOfPoint2f final_pts = new MatOfPoint2f();
         final_pts.fromList(lp);
 
-        Mat im_transformed=rgba.submat((int)boundRect.tl().y, (int)boundRect.br().y, (int)boundRect.tl().x, (int)boundRect.br().x);
+//        Mat cropped = new Mat(rgba, boundRect);
+        int top = (int)boundRect.tl().y;
+        int h = (int)boundRect.height;
+        int left = (int)boundRect.tl().x;
+        int w = (int)boundRect.width;
 
-        Mat H=Calib3d.findHomography(initial_pts, final_pts);
-        Imgproc.warpPerspective(im_transformed, im_transformed, H, im_transformed.size());
-        return im_transformed;
+        Mat im_transformed=rgba.submat(top, top+h, left, left+w);
+        Mat image =  new Mat(im_transformed.rows(), im_transformed.cols(), im_transformed.type(), new Scalar(0,0,100));
+        image.copyTo(im_transformed);
+
+        Mat H = new Mat();
+        H=Calib3d.findHomography(initial_pts, final_pts);
+        //TODO doesn't work
+        //Mat perspectiveTransform=new Mat();
+//        perspectiveTransform=Imgproc.getPerspectiveTransform(initial_pts,final_pts);
+        Mat src_mat=new Mat(4,1,CvType.CV_32FC2);
+        Mat dst_mat=new Mat(4,1,CvType.CV_32FC2);
+
+
+        src_mat.put(0,0,p_t.x,p_t.y,p_r.x,p_r.y,p_b.x,p_b.y,p_l.x,p_l.y);
+        //0,0,407.0,74.0, 1606.0, 74.0, 420.0, 2589.0, 1698.0,2589.0);
+        dst_mat.put(0,0,r_t.x,r_t.y,r_r.x,r_r.y,r_b.x,r_b.y,r_l.x,r_l.y);
+        //0.0,0.0,1600.0,0.0, 0.0,2500.0,1600.0,2500.0);
+        Mat perspectiveTransform=new Mat();
+        perspectiveTransform=Imgproc.getPerspectiveTransform(src_mat, dst_mat);
+
+        Mat dst=rgba.clone();
+
+        Imgproc.warpPerspective(rgba, dst, perspectiveTransform,rgba.size());
+
+        //  Imgproc.rectangle(rgba, r_t, r_b,color, 2);
+        //Mat new_img= new Mat();
+       //Imgproc.warpPerspective(rgba, new_img, H, rgba.size());
+
+        return dst;//new_img;
+
     }
 }

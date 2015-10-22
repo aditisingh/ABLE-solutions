@@ -2,11 +2,11 @@
 <items version="2" >
 
     <item
-        jar="/home/kunal/StudioProjects/image-manipulations/openCVSampleimagemanipulations/build/intermediates/exploded-aar/image-manipulations/openCVLibrary300/unspecified/jars/classes.jar"
+        jar="/home/aditi/ABLE/ABLE-solutions/image-manipulations/openCVSampleimagemanipulations/build/intermediates/exploded-aar/image-manipulations/openCVLibrary300/unspecified/jars/classes.jar"
         jumboMode="false"
         revision="23.0.1"
-        sha1="95d5a76d46ceb347d63ab066a9ba916f7cfe05dd">
-        <dex dex="/home/kunal/StudioProjects/image-manipulations/openCVSampleimagemanipulations/build/intermediates/pre-dexed/debug/classes-4347570a98ca511b9a397408050ae896ebe7a82b.jar" />
+        sha1="162e49bfc2ec71c0e2f8161efe31c6f8684635cb">
+        <dex dex="/home/aditi/ABLE/ABLE-solutions/image-manipulations/openCVSampleimagemanipulations/build/intermediates/pre-dexed/debug/classes-a9d80ddbce8198257ab6ab0d4c3df9125eeee8bb.jar" />
     </item>
 
 </items>
