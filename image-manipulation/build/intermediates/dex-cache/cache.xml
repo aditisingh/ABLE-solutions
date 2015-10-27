@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<items version="2" >
+
+    <item
+        jar="/home/aditi/ABLE-solutions/image-manipulation/openCVSampleimagemanipulations/build/intermediates/exploded-aar/image-manipulation/openCVLibrary300/unspecified/jars/classes.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="ad784cebf95145ccaaa4674993861c552288408d">
+        <dex dex="/home/aditi/ABLE-solutions/image-manipulation/openCVSampleimagemanipulations/build/intermediates/pre-dexed/debug/classes-e78eda0738539a5f2b13b0c1e561a9d5e3c629ab.jar" />
+    </item>
+    <item
+        jar="/home/aditi/ABLE-solutions/image-manipulation/openCVSampleimagemanipulations/build/intermediates/exploded-aar/image-manipulation/tesstwo/unspecified/jars/classes.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="4a6ac456f523bb1ea699b142ecda21b518318ec6">
+        <dex dex="/home/aditi/ABLE-solutions/image-manipulation/openCVSampleimagemanipulations/build/intermediates/pre-dexed/debug/classes-17ab4bc79bdab483c77e6321eb71904d8b08fadf.jar" />
+    </item>
+
+</items>

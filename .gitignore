@@ -1,30 +1,30 @@
 # ABLE-solutions
 # Built application files
-/image-manipulations/*/build/
+/image-manipulation/*/build/
 
 # Crashlytics configuations
-image-manipulations/com_crashlytics_export_strings.xml
+image-manipulation/com_crashlytics_export_strings.xml
 
 # Local configuration file (sdk path, etc)
-image-manipulations/local.properties
+image-manipulation/local.properties
 
 # Gradle generated files
-image-manipulations/.gradle/
+image-manipulation/.gradle/
 
 # Signing files
-image-manipulations/.signing/
+image-manipulation/.signing/
 
 # User-specific configurations
-image-manipulations/.idea/libraries/
-image-manipulations/.idea/workspace.xml
-image-manipulations/.idea/tasks.xml
-image-manipulations/.idea/.name
-image-manipulations/.idea/compiler.xml
-image-manipulations/.idea/copyright/profiles_settings.xml
-image-manipulations/.idea/encodings.xml
-image-manipulations/.idea/misc.xml
-image-manipulations/.idea/modules.xml
-image-manipulations/.idea/scopes/scope_settings.xml
-image-manipulations/.idea/vcs.xml
-image-manipulations/*.iml
+image-manipulation/.idea/libraries/
+image-manipulation/.idea/workspace.xml
+image-manipulation/.idea/tasks.xml
+image-manipulation/.idea/.name
+image-manipulation/.idea/compiler.xml
+image-manipulation/.idea/copyright/profiles_settings.xml
+image-manipulation/.idea/encodings.xml
+image-manipulation/.idea/misc.xml
+image-manipulation/.idea/modules.xml
+image-manipulation/.idea/scopes/scope_settings.xml
+image-manipulation/.idea/vcs.xml
+image-manipulation/*.iml
 
