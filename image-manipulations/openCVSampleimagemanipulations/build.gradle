@@ -20,4 +20,6 @@ android {
 
 dependencies {
     compile project(':openCVLibrary300')
+    compile project(':tesstwo')
 }
+

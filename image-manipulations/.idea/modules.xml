@@ -5,6 +5,7 @@
       <module fileurl="file://$PROJECT_DIR$/image-manipulations.iml" filepath="$PROJECT_DIR$/image-manipulations.iml" />
       <module fileurl="file://$PROJECT_DIR$/openCVLibrary300/openCVLibrary300.iml" filepath="$PROJECT_DIR$/openCVLibrary300/openCVLibrary300.iml" />
       <module fileurl="file://$PROJECT_DIR$/openCVSampleimagemanipulations/openCVSampleimagemanipulations.iml" filepath="$PROJECT_DIR$/openCVSampleimagemanipulations/openCVSampleimagemanipulations.iml" />
+      <module fileurl="file://$PROJECT_DIR$/tesstwo/tesstwo.iml" filepath="$PROJECT_DIR$/tesstwo/tesstwo.iml" />
     </modules>
   </component>
 </project>

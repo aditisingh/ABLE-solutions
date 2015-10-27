@@ -12,6 +12,7 @@
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/openCVLibrary300" />
             <option value="$PROJECT_DIR$/openCVSampleimagemanipulations" />
+            <option value="$PROJECT_DIR$/tesstwo" />
           </set>
         </option>
       </GradleProjectSettings>

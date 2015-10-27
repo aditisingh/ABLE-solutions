@@ -1,9 +1,16 @@
 package org.opencv.samples.imagemanipulations;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.lang.*;
 
+import android.speech.tts.TextToSpeech;
+import android.speech.tts.TextToSpeech.*;
 import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.CameraBridgeViewBase.CvCameraViewFrame;
 import org.opencv.android.LoaderCallbackInterface;
@@ -22,17 +29,58 @@ import org.opencv.core.Scalar;
 import org.opencv.core.Size;
 import org.opencv.android.CameraBridgeViewBase;
 import org.opencv.android.CameraBridgeViewBase.CvCameraViewListener2;
+import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.calib3d.Calib3d;
 
 import android.app.Activity;
+import android.content.Intent;
+import android.content.res.AssetManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
+import android.media.ExifInterface;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.WindowManager;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
 
-public class ImageManipulationsActivity extends Activity implements CvCameraViewListener2 {
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.zip.GZIPInputStream;
+
+import android.app.Activity;
+import android.content.Intent;
+import android.content.res.AssetManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
+import android.media.ExifInterface;
+import android.net.Uri;
+import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
+import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+
+import com.googlecode.tesseract.android.TessBaseAPI;
+import java.util.Locale;
+
+public class ImageManipulationsActivity extends Activity implements CvCameraViewListener2, TextToSpeech.OnInitListener {
     private static final String  TAG                 = "OCVSample::Activity";
 
     public static final int      VIEW_MODE_RGBA      = 0;
@@ -71,9 +119,59 @@ public class ImageManipulationsActivity extends Activity implements CvCameraView
     private Mat                  mSepiaKernel;
 
     public static int           viewMode = VIEW_MODE_RGBA;
+    public static final String DATA_PATH = Environment.getExternalStorageDirectory().toString() + "/SimpleAndroidOCR/";
+
+    // You should have the trained data file in assets folder
+    // You can get them at:
+    // http://code.google.com/p/tesseract-ocr/downloads/list
+    public static final String lang = "eng";
+
+    protected Button _button;
+    // protected ImageView _image;
+    protected EditText _field;
+    protected String _path;
+    protected boolean _taken;
+
+    protected static final String PHOTO_TAKEN = "photo_taken";
+
 
     private double dist(double x1, double x2, double y1, double y2) {
         return Math.sqrt((double)((x1-x2)*(x1-x2)+(y1-y2)*(y1-y2)));
+    }
+
+
+    private TextToSpeech tts;
+    private boolean startTTS = false;
+    public void onInit(int status) {
+        Log.v(TAG, "Language is not supported");
+        //TTS is successfully initialized
+        if (status == TextToSpeech.SUCCESS) {
+            //Setting speech language
+            int result = tts.setLanguage(Locale.US);
+
+            //If your device doesn't support language you set above
+            if (result == TextToSpeech.LANG_MISSING_DATA
+                    || result == TextToSpeech.LANG_NOT_SUPPORTED) {
+                //Cook simple toast message with message
+                Toast.makeText(this, "Language not supported", Toast.LENGTH_LONG).show();
+                Log.e(TAG, "Language is not supported");
+            } else {
+                startTTS = true;
+            }
+            //TTS is not initialized properly
+        } else {
+            Toast.makeText(this, "TTS Initilization Failed", Toast.LENGTH_LONG).show();
+            Log.e(TAG, "Initilization Failed");
+        }
+    }
+
+    private void speakOut(String text) {
+        if (text.length() == 0) {
+            tts.speak("You haven't typed text", TextToSpeech.QUEUE_FLUSH, null);
+            }
+        else {
+            tts.speak(text, TextToSpeech.QUEUE_ADD, null);
+        }
     }
 
     private BaseLoaderCallback  mLoaderCallback = new BaseLoaderCallback(this) {
@@ -100,7 +198,6 @@ public class ImageManipulationsActivity extends Activity implements CvCameraView
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        Log.i(TAG, "called onCreate");
         super.onCreate(savedInstanceState);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
@@ -108,6 +205,61 @@ public class ImageManipulationsActivity extends Activity implements CvCameraView
 
         mOpenCvCameraView = (CameraBridgeViewBase) findViewById(R.id.image_manipulations_activity_surface_view);
         mOpenCvCameraView.setCvCameraViewListener(this);
+
+        File directory = new File(DATA_PATH);
+        directory.mkdirs();
+
+        String[] paths = new String[] { DATA_PATH, DATA_PATH + "tessdata/" };
+
+        for (String path : paths) {
+            File dir = new File(path);
+            if (!dir.exists()) {
+                if (!dir.mkdirs()) {
+                    Log.v(TAG, "ERROR: Creation of directory " + path + " on sdcard failed");
+                    return;
+                } else {
+                    Log.v(TAG, "Created directory " + path + " on sdcard");
+                }
+            }
+
+        }
+
+
+        // lang.traineddata file with the app (in assets folder)
+        // You can get them at:
+        // http://code.google.com/p/tesseract-ocr/downloads/list
+        // This area needs work and optimization
+        if (!(new File(DATA_PATH + "tessdata/" + lang + ".traineddata")).exists()) {
+            try {
+                AssetManager assetManager = getAssets();
+                InputStream in = assetManager.open("tessdata/" + lang + ".traineddata");
+                //GZIPInputStream gin = new GZIPInputStream(in);
+                OutputStream out = new FileOutputStream(DATA_PATH
+                        + "tessdata/" + lang + ".traineddata");
+
+                // Transfer bytes from in to out
+                byte[] buf = new byte[1024];
+                int len;
+                //while ((lenf = gin.read(buff)) > 0) {
+                while ((len = in.read(buf)) > 0) {
+                    out.write(buf, 0, len);
+                }
+                in.close();
+                //gin.close();
+                out.close();
+
+                Log.v(TAG, "Copied " + lang + " traineddata");
+            } catch (IOException e) {
+                Log.e(TAG, "Was unable to copy " + lang + " traineddata " + e.toString());
+            }
+        }
+
+        Intent checkIntent = new Intent();
+        checkIntent.setAction(TextToSpeech.Engine.ACTION_CHECK_TTS_DATA);
+        startActivityForResult(checkIntent, RESULT_OK);
+        tts = new TextToSpeech(this, this);
+        tts.speak("Welcome", TextToSpeech.QUEUE_ADD, null);
+
     }
 
     @Override
@@ -212,16 +364,16 @@ public class ImageManipulationsActivity extends Activity implements CvCameraView
     public Mat onCameraFrame(CvCameraViewFrame inputFrame) {
         Mat rgba = inputFrame.rgba();
         Size sizeRgba = rgba.size();
-        Mat input=new Mat();
+        Mat input = new Mat();
         rgba.copyTo(input);
 
         int rows = (int) sizeRgba.height;//=720
         int cols = (int) sizeRgba.width;//=1280
 
         Mat gray = new Mat();
-        Size blur_size= new Size(3, 3);
+        Size blur_size = new Size(3, 3);
 
-       Mat imageMat=new Mat();
+        Mat imageMat = new Mat();
         Imgproc.cvtColor(rgba, gray, Imgproc.COLOR_BGR2GRAY);
         Imgproc.GaussianBlur(gray, gray, blur_size, 0, 0);
         Imgproc.adaptiveThreshold(gray, imageMat, 255, Imgproc.ADAPTIVE_THRESH_MEAN_C, Imgproc.THRESH_BINARY_INV, 25, 2);
@@ -252,27 +404,26 @@ public class ImageManipulationsActivity extends Activity implements CvCameraView
 //        Core.convertScaleAbs(grad_y, abs_grad_y);
 //        Core.addWeighted(abs_grad_x, 0.5, abs_grad_y, 0.5, 0, grad);
 //
-        double largest_area=0;
-        int largest_contour_index=0;
+        double largest_area = 0;
+        int largest_contour_index = 0;
 //
         Mat hierarchy = new Mat();
         ArrayList<MatOfPoint> contours = new ArrayList<MatOfPoint>();
         Point p = new Point(0, 0);
-        Imgproc.findContours(imageMat, contours, hierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE, p );
+        Imgproc.findContours(imageMat, contours, hierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE, p);
 //
-        Mat drawing = Mat.zeros( imageMat.size(), CvType.CV_8UC3 );
+        Mat drawing = Mat.zeros(imageMat.size(), CvType.CV_8UC3);
         Point p_r, p_l, p_t, p_b;
         p_r = new Point(0, 0);
         p_l = new Point(0, 0);
         p_b = new Point(0, 0);
         p_t = new Point(0, 0);
 
-        for( int i = 0; i< contours.size(); i++ )
-        {
-            double a=Imgproc.contourArea( contours.get(i), false );  //  Find the area of contour
-            if(a>largest_area){
-                largest_area=a;
-                largest_contour_index=i;                //Store the index of largest contour
+        for (int i = 0; i < contours.size(); i++) {
+            double a = Imgproc.contourArea(contours.get(i), false);  //  Find the area of contour
+            if (a > largest_area) {
+                largest_area = a;
+                largest_contour_index = i;                //Store the index of largest contour
                 // bounding_rect=boundingRect(contours[i]); // Find the bounding rectangle for biggest contour
             }
         }
@@ -290,76 +441,70 @@ public class ImageManipulationsActivity extends Activity implements CvCameraView
 
         MatOfPoint MOP2f2M = new MatOfPoint();
         contours_poly.convertTo(MOP2f2M, CvType.CV_32S);
-        Rect boundRect = Imgproc.boundingRect( MOP2f2M );
+        Rect boundRect = Imgproc.boundingRect(MOP2f2M);
 
         Point[] r;//,r2,r3,r4;
         r = new Point[4];
-        r[1]=new Point(0,0);
-        r[2]=new Point(0,0);
-        r[3]=new Point(0,0);
-        r[0]=new Point(0,0);
+        r[1] = new Point(0, 0);
+        r[2] = new Point(0, 0);
+        r[3] = new Point(0, 0);
+        r[0] = new Point(0, 0);
 
 //        Mat points=new MatOfPoint2f();
 //        points=contours.get(largest_contour_index);
-         RotatedRect minrect_roi = Imgproc.minAreaRect(MOP2M2f);
+        RotatedRect minrect_roi = Imgproc.minAreaRect(MOP2M2f);
 
-        r[0].x=minrect_roi.center.x+(minrect_roi.size.width/2)*Math.cos(minrect_roi.angle)-(minrect_roi.size.height/2)*Math.sin(minrect_roi.angle);
-        r[1].x=minrect_roi.center.x-(minrect_roi.size.width/2)*Math.cos(minrect_roi.angle)-(minrect_roi.size.height/2)*Math.sin(minrect_roi.angle);
-        r[3].x=minrect_roi.center.x+(minrect_roi.size.width/2)*Math.cos(minrect_roi.angle)+(minrect_roi.size.height/2)*Math.sin(minrect_roi.angle);
-        r[2].x=minrect_roi.center.x-(minrect_roi.size.width/2)*Math.cos(minrect_roi.angle)+(minrect_roi.size.height/2)*Math.sin(minrect_roi.angle);
+        r[0].x = minrect_roi.center.x + (minrect_roi.size.width / 2) * Math.cos(minrect_roi.angle) - (minrect_roi.size.height / 2) * Math.sin(minrect_roi.angle);
+        r[1].x = minrect_roi.center.x - (minrect_roi.size.width / 2) * Math.cos(minrect_roi.angle) - (minrect_roi.size.height / 2) * Math.sin(minrect_roi.angle);
+        r[3].x = minrect_roi.center.x + (minrect_roi.size.width / 2) * Math.cos(minrect_roi.angle) + (minrect_roi.size.height / 2) * Math.sin(minrect_roi.angle);
+        r[2].x = minrect_roi.center.x - (minrect_roi.size.width / 2) * Math.cos(minrect_roi.angle) + (minrect_roi.size.height / 2) * Math.sin(minrect_roi.angle);
 
-        r[0].y=minrect_roi.center.y+(minrect_roi.size.height/2)*Math.cos(minrect_roi.angle)+(minrect_roi.size.width/2)*Math.sin(minrect_roi.angle);
-        r[1].y=minrect_roi.center.y+(minrect_roi.size.height/2)*Math.cos(minrect_roi.angle)-(minrect_roi.size.width/2)*Math.sin(minrect_roi.angle);
-        r[3].y=minrect_roi.center.y-(minrect_roi.size.height/2)*Math.cos(minrect_roi.angle)+(minrect_roi.size.width/2)*Math.sin(minrect_roi.angle);
-        r[2].y=minrect_roi.center.y-(minrect_roi.size.height/2)*Math.cos(minrect_roi.angle)-(minrect_roi.size.width/2)*Math.sin(minrect_roi.angle);
-
+        r[0].y = minrect_roi.center.y + (minrect_roi.size.height / 2) * Math.cos(minrect_roi.angle) + (minrect_roi.size.width / 2) * Math.sin(minrect_roi.angle);
+        r[1].y = minrect_roi.center.y + (minrect_roi.size.height / 2) * Math.cos(minrect_roi.angle) - (minrect_roi.size.width / 2) * Math.sin(minrect_roi.angle);
+        r[3].y = minrect_roi.center.y - (minrect_roi.size.height / 2) * Math.cos(minrect_roi.angle) + (minrect_roi.size.width / 2) * Math.sin(minrect_roi.angle);
+        r[2].y = minrect_roi.center.y - (minrect_roi.size.height / 2) * Math.cos(minrect_roi.angle) - (minrect_roi.size.width / 2) * Math.sin(minrect_roi.angle);
 
 
         //managing negative values
-        for (int i=0;i<4;i++)
-        {
-            if(r[i].x<0)
-            {
-                for(int j=0;j<4;j++)
-                    r[i].x=r[i].x+r[j].x;
+        for (int i = 0; i < 4; i++) {
+            if (r[i].x < 0) {
+                for (int j = 0; j < 4; j++)
+                    r[i].x = r[i].x + r[j].x;
             }
         }
-        for (int i=0;i<4;i++)
-        {
-            if(r[i].y<0)
-            {
-                for(int j=0;j<4;j++)
-                    r[i].y=r[i].y+r[j].y;
+        for (int i = 0; i < 4; i++) {
+            if (r[i].y < 0) {
+                for (int j = 0; j < 4; j++)
+                    r[i].y = r[i].y + r[j].y;
             }
         }
 
-        p_r=p_l=p_b=p_t=r[0];
-        for(int i=0;i<4;i++)
-        {
-            if(r[i].x<=p_l.x)
-                p_l=r[i];
-            else if(r[i].x>=p_r.x)
-                p_r=r[i];
-            if(r[i].y>=p_b.y)
-                p_b=r[i];
-            else if(r[i].y<=p_t.y)
-                p_t=r[i];
+        p_r = p_l = p_b = p_t = r[0];
+        for (int i = 0; i < 4; i++) {
+            if (r[i].x <= p_l.x)
+                p_l = r[i];
+            else if (r[i].x >= p_r.x)
+                p_r = r[i];
+            if (r[i].y >= p_b.y)
+                p_b = r[i];
+            else if (r[i].y <= p_t.y)
+                p_t = r[i];
         }
 
-        Point r_b,r_a,r_c,r_d;
-        r_b=new Point(0,0);
-        r_a=new Point(0,0);
-        r_c=new Point(0,0);
-        r_d=new Point(0,0);
+        Point r_b, r_a, r_c, r_d;
+        r_b = new Point(0, 0);
+        r_a = new Point(0, 0);
+        r_c = new Point(0, 0);
+        r_d = new Point(0, 0);
 
-        r_b.x=boundRect.br().x;
-        r_b.y=boundRect.tl().y;
-        r_d.x=boundRect.tl().x;
-        r_d.y=boundRect.br().y;
-        r_c.x=boundRect.br().x;
-        r_c.y=boundRect.br().y;
-        r_a.x=boundRect.tl().x;
-        r_a.y=boundRect.tl().y;
+        r_b.x = boundRect.br().x;
+        r_b.y = boundRect.tl().y;
+        r_d.x = boundRect.tl().x;
+        r_d.y = boundRect.br().y;
+        r_c.x = boundRect.br().x;
+        r_c.y = boundRect.br().y;
+        r_a.x = boundRect.tl().x;
+        r_a.y = boundRect.tl().y;
 //        MatOfPoint2f rect_points;
 //        minrect_roi.points(rect_points);
         // points on minrect_roi
@@ -467,7 +612,7 @@ public class ImageManipulationsActivity extends Activity implements CvCameraView
 //        Imgproc.circle(rgba, r_r, 10, color, 1, 8, 0);
 //        Imgproc.circle(rgba, r_t, 10, color, 1, 8, 0);
 //
-        MatOfPoint2f final_pts = new MatOfPoint2f(r_b,r_a,r_d,r_c);
+        MatOfPoint2f final_pts = new MatOfPoint2f(r_b, r_a, r_d, r_c);
 //        final_pts.fromList(lp);
 //
 ////        return rgba;
@@ -496,15 +641,15 @@ public class ImageManipulationsActivity extends Activity implements CvCameraView
 //////        dst_mat.put(0,0,0,0,0.5*w,0,w,0,w,0.5*h,w,h,0.5*w,h,0,h,0,0.5*h);
 ////
 ////        //0.0,0.0,1600.0,0.0, 0.0,2500.0,1600.0,2500.0);
-        Mat perspectiveTransform=new Mat();
-        perspectiveTransform=Imgproc.getPerspectiveTransform(initial_pts,final_pts);
+        Mat perspectiveTransform = new Mat();
+        perspectiveTransform = Imgproc.getPerspectiveTransform(initial_pts, final_pts);
 //
 ////        Mat dst=rgba.clone();
         Mat dst = Mat.zeros(imageMat.size(), CvType.CV_8UC3);
-        Mat crop=Mat.zeros(imageMat.size(),CvType.CV_8UC3);
+        Mat crop = Mat.zeros(imageMat.size(), CvType.CV_8UC3);
 
 ////
-        Imgproc.warpPerspective(input, dst,perspectiveTransform,rgba.size());
+        Imgproc.warpPerspective(input, dst, perspectiveTransform, rgba.size());
 //        Rect roi=new Rect((int)boundRect.tl().x,(int)boundRect.tl().y,(int)boundRect.br().x-(int)boundRect.tl().x,(int) boundRect.br().y-(int)boundRect.tl().y);
 //////
 //        dst.submat(roi);
@@ -517,16 +662,123 @@ public class ImageManipulationsActivity extends Activity implements CvCameraView
 ////        //Imgproc.warpPerspective(rgba, new_img, H, rgba.size());
 ////
         ///improve contrast
-        Mat gray_dst=new Mat();
-        Mat res=new Mat();
+        Mat gray_dst = new Mat();
+        Mat res = new Mat();
 
         Imgproc.cvtColor(dst, gray_dst, Imgproc.COLOR_BGR2GRAY);
-        Imgproc.threshold(gray_dst,res,0,255,Imgproc.THRESH_BINARY|Imgproc.THRESH_OTSU);
+        Imgproc.threshold(gray_dst, res, 0, 255, Imgproc.THRESH_BINARY | Imgproc.THRESH_OTSU);
+
+        File StorageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "OCR");
+
+        if (!StorageDir.exists()) {
+            boolean dir_status=StorageDir.mkdirs();
+            Log.v(TAG, "Result " + String.valueOf(dir_status));
+
+        }
+
+        String filename = "test.png";
+        File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), filename);
+        _path = file.toString();
+
+        boolean out = Imgcodecs.imwrite(_path, res);
+        Log.v(TAG, "Path "+_path);
+        Log.v(TAG, "Result " + String.valueOf(out));
+        Log.v(TAG, "State "+String.valueOf(Environment.getExternalStorageState()));
+
+        onPhotoTaken();
+
         return res;//image;//dst;//rgba;//dst;//grad;//dst;//new_img;
 
-////        return crop;//out;//
-//// cropped;//rgba;//dst;//new_img;
-///////////////
     }
+
+    protected void onPhotoTaken() {
+        _taken = true;
+
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inSampleSize = 4;
+
+        Bitmap bitmap = BitmapFactory.decodeFile(_path, options);
+
+        try {
+            ExifInterface exif = new ExifInterface(_path);
+            int exifOrientation = exif.getAttributeInt(
+                    ExifInterface.TAG_ORIENTATION,
+                    ExifInterface.ORIENTATION_NORMAL);
+
+            Log.v(TAG, "Orient: " + exifOrientation);
+
+            int rotate = 0;
+
+            switch (exifOrientation) {
+                case ExifInterface.ORIENTATION_ROTATE_90:
+                    rotate = 90;
+                    break;
+                case ExifInterface.ORIENTATION_ROTATE_180:
+                    rotate = 180;
+                    break;
+                case ExifInterface.ORIENTATION_ROTATE_270:
+                    rotate = 270;
+                    break;
+            }
+
+            Log.v(TAG, "Rotation: " + rotate);
+
+            if (rotate != 0) {
+
+                // Getting width & height of the given image.
+                int w = bitmap.getWidth();
+                int h = bitmap.getHeight();
+
+                // Setting pre rotate
+                Matrix mtx = new Matrix();
+                mtx.preRotate(rotate);
+
+                // Rotating Bitmap
+                bitmap = Bitmap.createBitmap(bitmap, 0, 0, w, h, mtx, false);
+            }
+
+            // Convert to ARGB_8888, required by tess
+            bitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true);
+
+        } catch (IOException e) {
+            Log.e(TAG, "Couldn't correct orientation: " + e.toString());
+        }
+
+        // _image.setImageBitmap( bitmap );
+
+        Log.v(TAG, "Before baseApi");
+
+        TessBaseAPI baseApi = new TessBaseAPI();
+        baseApi.setDebug(true);
+        baseApi.init(DATA_PATH, lang);
+        baseApi.setImage(bitmap);
+
+        String recognizedText = baseApi.getUTF8Text();
+
+        baseApi.end();
+
+        // You now have the text in recognizedText var, you can do anything with it.
+        // We will display a stripped out trimmed alpha-numeric version of it (if lang is eng)
+        // so that garbage doesn't make it to the display.
+
+        Log.v(TAG, "OCRED TEXT: " + recognizedText);
+
+        if ( lang.equalsIgnoreCase("eng") ) {
+            recognizedText = recognizedText.replaceAll("[^a-zA-Z0-9]+", " ");
+        }
+
+        Log.d(TAG, "Status of tts"+String.valueOf(startTTS));
+        if (startTTS) {
+            speakOut(recognizedText);
+        }
+        recognizedText = recognizedText.trim();
+
+//        if ( recognizedText.length() != 0 ) {
+//            _field.setText(_field.getText().toString().length() == 0 ? recognizedText : _field.getText() + " " + recognizedText);
+//            _field.setSelection(_field.getText().toString().length());
+//        }
+    }
+
+
 }
-//
+
