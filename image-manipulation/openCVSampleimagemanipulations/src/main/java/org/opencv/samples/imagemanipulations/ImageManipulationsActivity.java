@@ -461,6 +461,8 @@ public class ImageManipulationsActivity extends Activity implements CvCameraView
 
     public Mat onCameraFrame(CvCameraViewFrame inputFrame) {
         Mat rgba = inputFrame.rgba();
+        mOpenCvCameraView.setFlashMode(this, 1);
+
         Size sizeRgba = rgba.size();
         Mat input = new Mat();
         rgba.copyTo(input);
@@ -483,71 +485,89 @@ public class ImageManipulationsActivity extends Activity implements CvCameraView
 
 
         ///////////////////////////////////////////////////////////
-        ///////// New untested code
+        ///////// Aditi's old code, not using currently
         ///////////////////////////////////////////////////////////
-        Mat bw1 = detected_edges.clone();
-        Mat element = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(50, 5));
+//        Mat bw1 = detected_edges.clone();
+//        Mat element = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(50, 5));
+//
+//        Mat erode_dst = new Mat();
+//        Imgproc.erode(detected_edges, detected_edges, element);
+//        Imgproc.dilate(detected_edges, erode_dst, element);
+//
+//        Mat bw = erode_dst.clone();
+//
+//        Log.d(TAG, "Erosion");
+//        ArrayList<MatOfPoint2f> blobs = blob_detection(bw, 200);
+//
+//        Log.d(TAG, "Blobs found");
+//        RotatedRect rect_im;
+//        Rect rect_bound;
+//        int num_blob = 1;
+//
+//        for (MatOfPoint2f m : blobs) {
+//            Log.d(TAG, "Processing a blob");
+//            Point[] rect_points = new Point[4];
+//            MatOfPoint2f mo2f = new MatOfPoint2f();
+//
+//            rect_im = Imgproc.minAreaRect(m);
+//            rect_bound = rect_im.boundingRect();
+//            rect_im.points(rect_points);
+//            mo2f.fromArray(rect_points);
+//
+//            Mat mask_ = new Mat(bw1.size(), CvType.CV_8U, new Scalar(255));
+//
+//            Log.d(TAG, "Mask processing");
+////            if (rect_im.size.width > rect_im.size.height) {
+//            num_blob++;
+//            Point center = rect_bound.tl();
+//
+//            for (int i = 0; i < bw1.rows(); ++i) {
+//                for (int j = 0; j < bw1.cols(); ++j) {
+//                    Point p = new Point(j, i);
+//                    if (isInROI(p, mo2f))
+//                        mask_.put(i, j, 255);
+//                    else
+//                        mask_.put(i, j, bw1.get(i, j));
+//                }
+//            }
+//
+//                Log.d(TAG, "Mask processing done");
+//                Rect r = new Rect((int) center.x - 10, (int) center.y, rect_bound.width + 30, rect_bound.height);
+//                Mat roi_ = mask_.submat(r);
+//
+//                Mat rot_mat = Imgproc.getRotationMatrix2D(rect_im.center, rect_im.angle, 1);
+//                Mat rotated = new Mat(rect_bound.width, rect_bound.height, CvType.CV_8UC1, new Scalar(255));
+//                roi_.copyTo(rotated);
+//                Imgproc.warpAffine(rotated, rotated, rot_mat, rotated.size(), Imgproc.INTER_CUBIC);
+//                Log.d(TAG, "Warping");
+//                String f_name = "warped" + num_blob + ".bmp";
+//                File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), f_name);
+//                _path = file.toString();
+//                Imgcodecs.imwrite(_path, rotated);
+////                imwrite(f_name, rotated);
+////            }
+//        }
+        ///////////////////////////////////////////////////////////////////////////////////////////////
+        ///////////////////////////////////////////////////////////////////////////////////////////////
 
-        Mat erode_dst = new Mat();
-        Imgproc.erode(detected_edges, detected_edges, element);
-        Imgproc.dilate(detected_edges, erode_dst, element);
-
-        Mat bw = erode_dst.clone();
-
-        Log.d(TAG, "Erosion");
-        ArrayList<MatOfPoint2f> blobs = blob_detection(bw, 200);
-
-        Log.d(TAG, "Blobs found");
-        RotatedRect rect_im;
-        Rect rect_bound;
-        int num_blob = 1;
-
-        for (MatOfPoint2f m : blobs) {
-            Log.d(TAG, "Processing a blob");
-            Point[] rect_points = new Point[4];
-            MatOfPoint2f mo2f = new MatOfPoint2f();
-
-            rect_im = Imgproc.minAreaRect(m);
-            rect_bound = rect_im.boundingRect();
-            rect_im.points(rect_points);
-            mo2f.fromArray(rect_points);
-
-            Mat mask_ = new Mat(bw1.size(), CvType.CV_8U, new Scalar(255));
-
-            Log.d(TAG, "Mask processing");
-            if (rect_im.size.width > rect_im.size.height) {
-                num_blob++;
-                Point center = rect_bound.tl();
-
-                for (int i = 0; i < bw1.rows(); ++i) {
-                    for (int j = 0; j < bw1.cols(); ++j) {
-                        Point p = new Point(j, i);
-                        if (isInROI(p, mo2f))
-                            mask_.put(i, j, 255);
-                        else
-                            mask_.put(i, j, bw1.get(i, j));
-                    }
-                }
-
-                Log.d(TAG, "Mask processing done");
-                Rect r = new Rect((int) center.x - 10, (int) center.y, rect_bound.width + 30, rect_bound.height);
-                Mat roi_ = mask_.submat(r);
-
-                Mat rot_mat = Imgproc.getRotationMatrix2D(rect_im.center, rect_im.angle, 1);
-                Mat rotated = new Mat(rect_bound.width, rect_bound.height, CvType.CV_8UC1, new Scalar(255));
-                roi_.copyTo(rotated);
-                Imgproc.warpAffine(rotated, rotated, rot_mat, rotated.size(), Imgproc.INTER_CUBIC);
-                Log.d(TAG, "Warping");
-                String f_name = "warped" + num_blob + ".bmp";
-                File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), f_name);
-                _path = file.toString();
-                Imgcodecs.imwrite(_path, rotated);
-//                imwrite(f_name, rotated);
-            }
+        //////////////////////////////////////////////////////////////////////////////////////////////
+        ////////// Method to rotate based on Hough transform
+        //////////////////////////////////////////////////////////////////////////////////////////////
+        Mat bw_ = new Mat();
+        Core.bitwise_not(detected_edges, bw_);
+        Mat lines = new Mat();
+        Imgproc.HoughLinesP(bw_, lines, 1, Math.PI/180, 100, cols / 2.f, 20);
+        Mat disp_lines = new Mat(bw_.size(), CvType.CV_8UC1, new Scalar(0, 0, 0));
+        double angle = 0.;
+        double nb_lines = lines.size().height;
+        for (double i = 0; i < nb_lines; ++i)
+        {
+            angle += Math.atan2(lines.get((int)i,0)[3] - lines.get((int)i, 0)[1], lines.get((int)i, 0)[2] - lines.get((int)i, 0)[0]);
         }
-        ///////////////////////////////////////////////////////////////////////////////////////////////
-        ///////////////////////////////////////////////////////////////////////////////////////////////
+        angle /= nb_lines; // mean angle, in radians.
+        Log.d(TAG, "Angle"+angle);//correct
 
+        // TODO Rotated doc -> Extract doc -> Save it
 //        String filename = "test.bmp";
 //        File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), filename);
 //        _path = file.toString();
@@ -560,6 +580,7 @@ public class ImageManipulationsActivity extends Activity implements CvCameraView
 //        onPhotoTaken();
 //
 //        return detected_edges;//rgba;//image;//dst;//rgba;//dst;//grad;//dst;//new_img;
+        mOpenCvCameraView.setFlashMode(this, 4);
         return rgba;
     }
 
