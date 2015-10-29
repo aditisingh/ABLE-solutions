@@ -11,6 +11,7 @@ import java.lang.*;
 
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.TextToSpeech.*;
+
 import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.CameraBridgeViewBase.CvCameraViewFrame;
 import org.opencv.android.JavaCameraView;
@@ -50,6 +51,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -79,47 +81,48 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.googlecode.tesseract.android.TessBaseAPI;
+
 import java.util.Locale;
 
 public class ImageManipulationsActivity extends Activity implements CvCameraViewListener2, TextToSpeech.OnInitListener {
-    private static final String  TAG                 = "OCVSample::Activity";
+    private static final String TAG = "OCVSample::Activity";
 
-    public static final int      VIEW_MODE_RGBA      = 0;
-    public static final int      VIEW_MODE_HIST      = 1;
-    public static final int      VIEW_MODE_CANNY     = 2;
-    public static final int      VIEW_MODE_SEPIA     = 3;
-    public static final int      VIEW_MODE_SOBEL     = 4;
-    public static final int      VIEW_MODE_ZOOM      = 5;
-    public static final int      VIEW_MODE_PIXELIZE  = 6;
-    public static final int      VIEW_MODE_POSTERIZE = 7;
+    public static final int VIEW_MODE_RGBA = 0;
+    public static final int VIEW_MODE_HIST = 1;
+    public static final int VIEW_MODE_CANNY = 2;
+    public static final int VIEW_MODE_SEPIA = 3;
+    public static final int VIEW_MODE_SOBEL = 4;
+    public static final int VIEW_MODE_ZOOM = 5;
+    public static final int VIEW_MODE_PIXELIZE = 6;
+    public static final int VIEW_MODE_POSTERIZE = 7;
 
-    private MenuItem             mItemPreviewRGBA;
-    private MenuItem             mItemPreviewHist;
-    private MenuItem             mItemPreviewCanny;
-    private MenuItem             mItemPreviewSepia;
-    private MenuItem             mItemPreviewSobel;
-    private MenuItem             mItemPreviewZoom;
-    private MenuItem             mItemPreviewPixelize;
-    private MenuItem             mItemPreviewPosterize;
-    private JavaCamResView       mOpenCvCameraView;
+    private MenuItem mItemPreviewRGBA;
+    private MenuItem mItemPreviewHist;
+    private MenuItem mItemPreviewCanny;
+    private MenuItem mItemPreviewSepia;
+    private MenuItem mItemPreviewSobel;
+    private MenuItem mItemPreviewZoom;
+    private MenuItem mItemPreviewPixelize;
+    private MenuItem mItemPreviewPosterize;
+    private JavaCamResView mOpenCvCameraView;
 
-    private Size                 mSize0;
+    private Size mSize0;
 
-    private Mat                  mIntermediateMat;
-    private Mat                  mMat0;
-    private MatOfInt             mChannels[];
-    private MatOfInt             mHistSize;
-    private int                  mHistSizeNum = 25;
-    private MatOfFloat           mRanges;
-    private Scalar               mColorsRGB[];
-    private Scalar               mColorsHue[];
-    private Scalar               mWhilte;
-    private Point                mP1;
-    private Point                mP2;
-    private float                mBuff[];
-    private Mat                  mSepiaKernel;
+    private Mat mIntermediateMat;
+    private Mat mMat0;
+    private MatOfInt mChannels[];
+    private MatOfInt mHistSize;
+    private int mHistSizeNum = 25;
+    private MatOfFloat mRanges;
+    private Scalar mColorsRGB[];
+    private Scalar mColorsHue[];
+    private Scalar mWhilte;
+    private Point mP1;
+    private Point mP2;
+    private float mBuff[];
+    private Mat mSepiaKernel;
 
-    public static int           viewMode = VIEW_MODE_RGBA;
+    public static int viewMode = VIEW_MODE_RGBA;
     public static final String DATA_PATH = Environment.getExternalStorageDirectory().toString() + "/SimpleAndroidOCR/";
 
     // You should have the trained data file in assets folder
@@ -137,12 +140,104 @@ public class ImageManipulationsActivity extends Activity implements CvCameraView
 
 
     private double dist(double x1, double x2, double y1, double y2) {
-        return Math.sqrt((double)((x1-x2)*(x1-x2)+(y1-y2)*(y1-y2)));
+        return Math.sqrt((double) ((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2)));
+    }
+
+    double computeProduct(Point p, Point a, Point b) {
+        double k = (a.y - b.y) / (a.x - b.x);
+        double j = a.y - k * a.x;
+        return k * p.x - p.y + j;
+    }
+
+    private boolean isInROI(Point p, MatOfPoint2f roi) {
+        double[] pro = new double[4];
+        Point[] points = roi.toArray();
+        for (int i = 0; i < 4; ++i) {
+            pro[i] = computeProduct(p, points[i], points[(i + 1) % 4]);
+        }
+
+        if (pro[0] * pro[2] < 0 && pro[1] * pro[3] < 0) {
+            return false;
+        }
+        return true;
+    }
+
+    // Give a binary image and get back blobs from that
+    ArrayList<MatOfPoint2f> blob_detection(Mat binary_image, int min_blob_size) {
+        ArrayList<MatOfPoint2f> blobs = new ArrayList<MatOfPoint2f>();
+
+        // Fill the label_image with the blobs
+        // 0  - background
+        // 1  - unlabelled foreground
+        // 2+ - labelled foreground
+
+        // input is a binary image therefore values are either 0 or 1
+        // out objective is to find a set of 1's that are together and assign 2 to it
+        // then look for other 1's, and assign 3 to it....so on a soforth
+
+        Mat label_image = new Mat();
+        binary_image.convertTo(label_image, CvType.CV_32FC1); // weird it doesn't support CV_32S! Because the CV::SCALAR is a double value in the function floodfill
+
+        int label_count = 2; // starts at 2 because 0,1 are used already
+
+        //  // Erosion. Optional
+        //  // TODO Add flag to select
+        //  Mat element = getStructuringElement( MORPH_RECT,
+        //   Size( 2*3 + 1, 2*3+1 ),
+        // Point( 0, 0 ) );
+        //  // Apply the erosion operation
+        //  erode( label_image, label_image, element );
+
+        // just check the Matrix of label_image to make sure we have 0 and 1 only
+        // cout << label_image << endl;
+        for (int y = 0; y < binary_image.rows(); y++) {
+            for (int x = 0; x < binary_image.cols(); x++) {
+                double checker = label_image.get(y, x)[0]; //need to look for float and not int as the scalar value is of type double
+                Rect rect = new Rect();
+                int size = 0;
+                // cout <<checker<<endl;
+                if (checker == 0) {
+                    //fill region from a point
+                    Mat mask = new Mat(label_image.rows() + 2, label_image.cols() + 2, CvType.CV_8UC1);
+                    Imgproc.floodFill(label_image, mask, new Point(x, y), new Scalar(label_count), rect, new Scalar(0), new Scalar(0), 4);
+                    label_count++;
+                    // cout << label_image << endl <<"by checking: " << label_image.at<float>(y,x) <<endl;
+                    //cout << label_image;
+
+                    //a vector of all points in a blob
+                    ArrayList<Point> temp = new ArrayList<Point>();
+
+                    for (int i = rect.y; i < (rect.y + rect.height); i++) {
+                        for (int j = rect.x; j < (rect.x + rect.width); j++) {
+                            double chk = label_image.get(i, j)[0];
+                            // std::cout << chk << std::endl;
+                            if (chk == label_count - 1) {
+                                temp.add(new Point(j, i));
+                                size++;
+                            }
+                        }
+                    }
+                    MatOfPoint2f blob = new MatOfPoint2f();
+                    blob.fromList(temp);
+
+                    if (size > min_blob_size) {
+                        //place the points of a single blob in a grouping
+                        //a vector of vector points
+                        blobs.add(blob);
+                        Log.d(TAG, "Added blob");
+                        // circle(binary_image, *blob.begin(), 10, Scalar(255), 5);
+                    }
+                }
+            }
+        }
+
+        return blobs;
     }
 
 
     private TextToSpeech tts;
     private boolean startTTS = false;
+
     public void onInit(int status) {
         Log.v(TAG, "Language is not supported");
         //TTS is successfully initialized
@@ -169,25 +264,24 @@ public class ImageManipulationsActivity extends Activity implements CvCameraView
     private void speakOut(String text) {
         if (text.length() == 0) {
             tts.speak("No text detected.", TextToSpeech.QUEUE_FLUSH, null);
-        }
-        else {
+        } else {
             tts.speak(text, TextToSpeech.QUEUE_ADD, null);
         }
     }
 
-    private BaseLoaderCallback  mLoaderCallback = new BaseLoaderCallback(this) {
+    private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(this) {
         @Override
         public void onManagerConnected(int status) {
             switch (status) {
-                case LoaderCallbackInterface.SUCCESS:
-                {
+                case LoaderCallbackInterface.SUCCESS: {
                     Log.i(TAG, "OpenCV loaded successfully");
                     mOpenCvCameraView.enableView();
-                } break;
-                default:
-                {
+                }
+                break;
+                default: {
                     super.onManagerConnected(status);
-                } break;
+                }
+                break;
             }
         }
     };
@@ -196,7 +290,9 @@ public class ImageManipulationsActivity extends Activity implements CvCameraView
         Log.i(TAG, "Instantiated new " + this.getClass());
     }
 
-    /** Called when the activity is first created. */
+    /**
+     * Called when the activity is first created.
+     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -210,7 +306,7 @@ public class ImageManipulationsActivity extends Activity implements CvCameraView
         File directory = new File(DATA_PATH);
         directory.mkdirs();
 
-        String[] paths = new String[] { DATA_PATH, DATA_PATH + "tessdata/" };
+        String[] paths = new String[]{DATA_PATH, DATA_PATH + "tessdata/"};
 
         for (String path : paths) {
             File dir = new File(path);
@@ -264,16 +360,14 @@ public class ImageManipulationsActivity extends Activity implements CvCameraView
     }
 
     @Override
-    public void onPause()
-    {
+    public void onPause() {
         super.onPause();
         if (mOpenCvCameraView != null)
             mOpenCvCameraView.disableView();
     }
 
     @Override
-    public void onResume()
-    {
+    public void onResume() {
         super.onResume();
         if (!OpenCVLoader.initDebug()) {
             Log.d(TAG, "Internal OpenCV library not found. Using OpenCV Manager for initialization");
@@ -293,13 +387,13 @@ public class ImageManipulationsActivity extends Activity implements CvCameraView
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         Log.i(TAG, "called onCreateOptionsMenu");
-        mItemPreviewRGBA  = menu.add("Preview RGBA");
-        mItemPreviewHist  = menu.add("Histograms");
+        mItemPreviewRGBA = menu.add("Preview RGBA");
+        mItemPreviewHist = menu.add("Histograms");
         mItemPreviewCanny = menu.add("Canny");
         mItemPreviewSepia = menu.add("Sepia");
         mItemPreviewSobel = menu.add("Sobel");
-        mItemPreviewZoom  = menu.add("Zoom");
-        mItemPreviewPixelize  = menu.add("Pixelize");
+        mItemPreviewZoom = menu.add("Zoom");
+        mItemPreviewPixelize = menu.add("Pixelize");
         mItemPreviewPosterize = menu.add("Posterize");
         return true;
     }
@@ -329,18 +423,18 @@ public class ImageManipulationsActivity extends Activity implements CvCameraView
     public void onCameraViewStarted(int width, int height) {
         mIntermediateMat = new Mat();
         mSize0 = new Size();
-        mChannels = new MatOfInt[] { new MatOfInt(0), new MatOfInt(1), new MatOfInt(2) };
+        mChannels = new MatOfInt[]{new MatOfInt(0), new MatOfInt(1), new MatOfInt(2)};
         mBuff = new float[mHistSizeNum];
         mHistSize = new MatOfInt(mHistSizeNum);
         mRanges = new MatOfFloat(0f, 256f);
-        mMat0  = new Mat();
-        mColorsRGB = new Scalar[] { new Scalar(200, 0, 0, 255), new Scalar(0, 200, 0, 255), new Scalar(0, 0, 200, 255) };
-        mColorsHue = new Scalar[] {
-                new Scalar(255, 0, 0, 255),   new Scalar(255, 60, 0, 255),  new Scalar(255, 120, 0, 255), new Scalar(255, 180, 0, 255), new Scalar(255, 240, 0, 255),
-                new Scalar(215, 213, 0, 255), new Scalar(150, 255, 0, 255), new Scalar(85, 255, 0, 255),  new Scalar(20, 255, 0, 255),  new Scalar(0, 255, 30, 255),
-                new Scalar(0, 255, 85, 255),  new Scalar(0, 255, 150, 255), new Scalar(0, 255, 215, 255), new Scalar(0, 234, 255, 255), new Scalar(0, 170, 255, 255),
-                new Scalar(0, 120, 255, 255), new Scalar(0, 60, 255, 255),  new Scalar(0, 0, 255, 255),   new Scalar(64, 0, 255, 255),  new Scalar(120, 0, 255, 255),
-                new Scalar(180, 0, 255, 255), new Scalar(255, 0, 255, 255), new Scalar(255, 0, 215, 255), new Scalar(255, 0, 85, 255),  new Scalar(255, 0, 0, 255)
+        mMat0 = new Mat();
+        mColorsRGB = new Scalar[]{new Scalar(200, 0, 0, 255), new Scalar(0, 200, 0, 255), new Scalar(0, 0, 200, 255)};
+        mColorsHue = new Scalar[]{
+                new Scalar(255, 0, 0, 255), new Scalar(255, 60, 0, 255), new Scalar(255, 120, 0, 255), new Scalar(255, 180, 0, 255), new Scalar(255, 240, 0, 255),
+                new Scalar(215, 213, 0, 255), new Scalar(150, 255, 0, 255), new Scalar(85, 255, 0, 255), new Scalar(20, 255, 0, 255), new Scalar(0, 255, 30, 255),
+                new Scalar(0, 255, 85, 255), new Scalar(0, 255, 150, 255), new Scalar(0, 255, 215, 255), new Scalar(0, 234, 255, 255), new Scalar(0, 170, 255, 255),
+                new Scalar(0, 120, 255, 255), new Scalar(0, 60, 255, 255), new Scalar(0, 0, 255, 255), new Scalar(64, 0, 255, 255), new Scalar(120, 0, 255, 255),
+                new Scalar(180, 0, 255, 255), new Scalar(255, 0, 255, 255), new Scalar(255, 0, 215, 255), new Scalar(255, 0, 85, 255), new Scalar(255, 0, 0, 255)
         };
         mWhilte = Scalar.all(255);
         mP1 = new Point();
@@ -380,26 +474,93 @@ public class ImageManipulationsActivity extends Activity implements CvCameraView
         Mat imageMat = new Mat();
         Imgproc.cvtColor(rgba, gray, Imgproc.COLOR_BGR2GRAY);
 
-        gray.convertTo(gray,CvType.CV_32FC1);
-        Mat gray_dst=new Mat();
-        Core.pow(gray,0.7,gray_dst);
-        gray_dst.convertTo(gray_dst,CvType.CV_8UC1);
-        Mat detected_edges=new Mat();
+        gray.convertTo(gray, CvType.CV_32FC1);
+        Mat gray_dst = new Mat();
+        Core.pow(gray, 0.7, gray_dst);
+        gray_dst.convertTo(gray_dst, CvType.CV_8UC1);
+        Mat detected_edges = new Mat();
         Imgproc.adaptiveThreshold(gray_dst, detected_edges, 255, Imgproc.ADAPTIVE_THRESH_MEAN_C, Imgproc.THRESH_BINARY, 25, 2);
 
-        String filename = "test.bmp";
-        File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), filename);
-        _path = file.toString();
 
-        boolean out = Imgcodecs.imwrite(_path,detected_edges);//rgba);//rgba);
-        Log.v(TAG, "Path " + _path);
-        Log.v(TAG, "Result " + String.valueOf(out));
-        Log.v(TAG, "State "+String.valueOf(Environment.getExternalStorageState()));
+        ///////////////////////////////////////////////////////////
+        ///////// New untested code
+        ///////////////////////////////////////////////////////////
+        Mat bw1 = detected_edges.clone();
+        Mat element = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(50, 5));
 
-        onPhotoTaken();
+        Mat erode_dst = new Mat();
+        Imgproc.erode(detected_edges, detected_edges, element);
+        Imgproc.dilate(detected_edges, erode_dst, element);
 
-        return detected_edges;//rgba;//image;//dst;//rgba;//dst;//grad;//dst;//new_img;
+        Mat bw = erode_dst.clone();
 
+        Log.d(TAG, "Erosion");
+        ArrayList<MatOfPoint2f> blobs = blob_detection(bw, 200);
+
+        Log.d(TAG, "Blobs found");
+        RotatedRect rect_im;
+        Rect rect_bound;
+        int num_blob = 1;
+
+        for (MatOfPoint2f m : blobs) {
+            Log.d(TAG, "Processing a blob");
+            Point[] rect_points = new Point[4];
+            MatOfPoint2f mo2f = new MatOfPoint2f();
+
+            rect_im = Imgproc.minAreaRect(m);
+            rect_bound = rect_im.boundingRect();
+            rect_im.points(rect_points);
+            mo2f.fromArray(rect_points);
+
+            Mat mask_ = new Mat(bw1.size(), CvType.CV_8U, new Scalar(255));
+
+            Log.d(TAG, "Mask processing");
+            if (rect_im.size.width > rect_im.size.height) {
+                num_blob++;
+                Point center = rect_bound.tl();
+
+                for (int i = 0; i < bw1.rows(); ++i) {
+                    for (int j = 0; j < bw1.cols(); ++j) {
+                        Point p = new Point(j, i);
+                        if (isInROI(p, mo2f))
+                            mask_.put(i, j, 255);
+                        else
+                            mask_.put(i, j, bw1.get(i, j));
+                    }
+                }
+
+                Log.d(TAG, "Mask processing done");
+                Rect r = new Rect((int) center.x - 10, (int) center.y, rect_bound.width + 30, rect_bound.height);
+                Mat roi_ = mask_.submat(r);
+
+                Mat rot_mat = Imgproc.getRotationMatrix2D(rect_im.center, rect_im.angle, 1);
+                Mat rotated = new Mat(rect_bound.width, rect_bound.height, CvType.CV_8UC1, new Scalar(255));
+                roi_.copyTo(rotated);
+                Imgproc.warpAffine(rotated, rotated, rot_mat, rotated.size(), Imgproc.INTER_CUBIC);
+                Log.d(TAG, "Warping");
+                String f_name = "warped" + num_blob + ".bmp";
+                File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), f_name);
+                _path = file.toString();
+                Imgcodecs.imwrite(_path, rotated);
+//                imwrite(f_name, rotated);
+            }
+        }
+        ///////////////////////////////////////////////////////////////////////////////////////////////
+        ///////////////////////////////////////////////////////////////////////////////////////////////
+
+//        String filename = "test.bmp";
+//        File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), filename);
+//        _path = file.toString();
+
+//        boolean out = Imgcodecs.imwrite(_path,detected_edges);//rgba);//rgba);
+//        Log.v(TAG, "Path " + _path);
+//        Log.v(TAG, "Result " + String.valueOf(out));
+//        Log.v(TAG, "State "+String.valueOf(Environment.getExternalStorageState()));
+//
+//        onPhotoTaken();
+//
+//        return detected_edges;//rgba;//image;//dst;//rgba;//dst;//grad;//dst;//new_img;
+        return rgba;
     }
 
     protected void onPhotoTaken() {
@@ -473,11 +634,11 @@ public class ImageManipulationsActivity extends Activity implements CvCameraView
 
         Log.v(TAG, "OCRED TEXT: " + recognizedText);
 
-        if ( lang.equalsIgnoreCase("eng") ) {
+        if (lang.equalsIgnoreCase("eng")) {
             recognizedText = recognizedText.replaceAll("[^a-zA-Z0-9]+", " ");
         }
 
-        Log.d(TAG, "Status of tts"+String.valueOf(startTTS));
+        Log.d(TAG, "Status of tts" + String.valueOf(startTTS));
         if (startTTS) {
             speakOut(recognizedText);
         }

@@ -1,984 +1,911 @@
-Obj, kernel.nativeObj, anchor.x, anchor.y, iterations, borderType, borderValue.val[0], borderValue.val[1], borderValue.val[2], borderValue.val[3]);
-        
-        return;
-    }
-
-    //javadoc: erode(src, dst, kernel, anchor, iterations)
-    public static void erode(Mat src, Mat dst, Mat kernel, Point anchor, int iterations)
-    {
-        
-        erode_1(src.nativeObj, dst.nativeObj, kernel.nativeObj, anchor.x, anchor.y, iterations);
-        
-        return;
-    }
-
-    //javadoc: erode(src, dst, kernel)
-    public static void erode(Mat src, Mat dst, Mat kernel)
-    {
-        
-        erode_2(src.nativeObj, dst.nativeObj, kernel.nativeObj);
-        
-        return;
-    }
-
-
-    //
-    // C++:  void dilate(Mat src, Mat& dst, Mat kernel, Point anchor = Point(-1,-1), int iterations = 1, int borderType = BORDER_CONSTANT, Scalar borderValue = morphologyDefaultBorderValue())
-    //
-
-    //javadoc: dilate(src, dst, kernel, anchor, iterations, borderType, borderValue)
-    public static void dilate(Mat src, Mat dst, Mat kernel, Point anchor, int iterations, int borderType, Scalar borderValue)
-    {
-        
-        dilate_0(src.nativeObj, dst.nativeObj, kernel.nativeObj, anchor.x, anchor.y, iterations, borderType, borderValue.val[0], borderValue.val[1], borderValue.val[2], borderValue.val[3]);
-        
-        return;
-    }
-
-    //javadoc: dilate(src, dst, kernel, anchor, iterations)
-    public static void dilate(Mat src, Mat dst, Mat kernel, Point anchor, int iterations)
-    {
-        
-        dilate_1(src.nativeObj, dst.nativeObj, kernel.nativeObj, anchor.x, anchor.y, iterations);
-        
-        return;
-    }
-
-    //javadoc: dilate(src, dst, kernel)
-    public static void dilate(Mat src, Mat dst, Mat kernel)
-    {
-        
-        dilate_2(src.nativeObj, dst.nativeObj, kernel.nativeObj);
-        
-        return;
-    }
-
-
-    //
-    // C++:  void morphologyEx(Mat src, Mat& dst, int op, Mat kernel, Point anchor = Point(-1,-1), int iterations = 1, int borderType = BORDER_CONSTANT, Scalar borderValue = morphologyDefaultBorderValue())
-    //
-
-    //javadoc: morphologyEx(src, dst, op, kernel, anchor, iterations, borderType, borderValue)
-    public static void morphologyEx(Mat src, Mat dst, int op, Mat kernel, Point anchor, int iterations, int borderType, Scalar borderValue)
-    {
-        
-        morphologyEx_0(src.nativeObj, dst.nativeObj, op, kernel.nativeObj, anchor.x, anchor.y, iterations, borderType, borderValue.val[0], borderValue.val[1], borderValue.val[2], borderValue.val[3]);
-        
-        return;
-    }
-
-    //javadoc: morphologyEx(src, dst, op, kernel, anchor, iterations)
-    public static void morphologyEx(Mat src, Mat dst, int op, Mat kernel, Point anchor, int iterations)
-    {
-        
-        morphologyEx_1(src.nativeObj, dst.nativeObj, op, kernel.nativeObj, anchor.x, anchor.y, iterations);
-        
-        return;
-    }
-
-    //javadoc: morphologyEx(src, dst, op, kernel)
-    public static void morphologyEx(Mat src, Mat dst, int op, Mat kernel)
-    {
-        
-        morphologyEx_2(src.nativeObj, dst.nativeObj, op, kernel.nativeObj);
-        
-        return;
-    }
-
-
-    //
-    // C++:  void resize(Mat src, Mat& dst, Size dsize, double fx = 0, double fy = 0, int interpolation = INTER_LINEAR)
-    //
-
-    //javadoc: resize(src, dst, dsize, fx, fy, interpolation)
-    public static void resize(Mat src, Mat dst, Size dsize, double fx, double fy, int interpolation)
-    {
-        
-        resize_0(src.nativeObj, dst.nativeObj, dsize.width, dsize.height, fx, fy, interpolation);
-        
-        return;
-    }
-
-    //javadoc: resize(src, dst, dsize)
-    public static void resize(Mat src, Mat dst, Size dsize)
-    {
-        
-        resize_1(src.nativeObj, dst.nativeObj, dsize.width, dsize.height);
-        
-        return;
-    }
-
-
-    //
-    // C++:  void warpAffine(Mat src, Mat& dst, Mat M, Size dsize, int flags = INTER_LINEAR, int borderMode = BORDER_CONSTANT, Scalar borderValue = Scalar())
-    //
-
-    //javadoc: warpAffine(src, dst, M, dsize, flags, borderMode, borderValue)
-    public static void warpAffine(Mat src, Mat dst, Mat M, Size dsize, int flags, int borderMode, Scalar borderValue)
-    {
-        
-        warpAffine_0(src.nativeObj, dst.nativeObj, M.nativeObj, dsize.width, dsize.height, flags, borderMode, borderValue.val[0], borderValue.val[1], borderValue.val[2], borderValue.val[3]);
-        
-        return;
-    }
-
-    //javadoc: warpAffine(src, dst, M, dsize, flags)
-    public static void warpAffine(Mat src, Mat dst, Mat M, Size dsize, int flags)
-    {
-        
-        warpAffine_1(src.nativeObj, dst.nativeObj, M.nativeObj, dsize.width, dsize.height, flags);
-        
-        return;
-    }
-
-    //javadoc: warpAffine(src, dst, M, dsize)
-    public static void warpAffine(Mat src, Mat dst, Mat M, Size dsize)
-    {
-        
-        warpAffine_2(src.nativeObj, dst.nativeObj, M.nativeObj, dsize.width, dsize.height);
-        
-        return;
-    }
-
-
-    //
-    // C++:  void warpPerspective(Mat src, Mat& dst, Mat M, Size dsize, int flags = INTER_LINEAR, int borderMode = BORDER_CONSTANT, Scalar borderValue = Scalar())
-    //
-
-    //javadoc: warpPerspective(src, dst, M, dsize, flags, borderMode, borderValue)
-    public static void warpPerspective(Mat src, Mat dst, Mat M, Size dsize, int flags, int borderMode, Scalar borderValue)
-    {
-        
-        warpPerspective_0(src.nativeObj, dst.nativeObj, M.nativeObj, dsize.width, dsize.height, flags, borderMode, borderValue.val[0], borderValue.val[1], borderValue.val[2], borderValue.val[3]);
-        
-        return;
-    }
-
-    //javadoc: warpPerspective(src, dst, M, dsize, flags)
-    public static void warpPerspective(Mat src, Mat dst, Mat M, Size dsize, int flags)
-    {
-        
-        warpPerspective_1(src.nativeObj, dst.nativeObj, M.nativeObj, dsize.width, dsize.height, flags);
-        
-        return;
-    }
-
-    //javadoc: warpPerspective(src, dst, M, dsize)
-    public static void warpPerspective(Mat src, Mat dst, Mat M, Size dsize)
-    {
-        
-        warpPerspective_2(src.nativeObj, dst.nativeObj, M.nativeObj, dsize.width, dsize.height);
-        
-        return;
-    }
-
-
-    //
-    // C++:  void remap(Mat src, Mat& dst, Mat map1, Mat map2, int interpolation, int borderMode = BORDER_CONSTANT, Scalar borderValue = Scalar())
-    //
-
-    //javadoc: remap(src, dst, map1, map2, interpolation, borderMode, borderValue)
-    public static void remap(Mat src, Mat dst, Mat map1, Mat map2, int interpolation, int borderMode, Scalar borderValue)
-    {
-        
-        remap_0(src.nativeObj, dst.nativeObj, map1.nativeObj, map2.nativeObj, interpolation, borderMode, borderValue.val[0], borderValue.val[1], borderValue.val[2], borderValue.val[3]);
-        
-        return;
-    }
-
-    //javadoc: remap(src, dst, map1, map2, interpolation)
-    public static void remap(Mat src, Mat dst, Mat map1, Mat map2, int interpolation)
-    {
-        
-        remap_1(src.nativeObj, dst.nativeObj, map1.nativeObj, map2.nativeObj, interpolation);
-        
-        return;
-    }
-
-
-    //
-    // C++:  void convertMaps(Mat map1, Mat map2, Mat& dstmap1, Mat& dstmap2, int dstmap1type, bool nninterpolation = false)
-    //
-
-    //javadoc: convertMaps(map1, map2, dstmap1, dstmap2, dstmap1type, nninterpolation)
-    public static void convertMaps(Mat map1, Mat map2, Mat dstmap1, Mat dstmap2, int dstmap1type, boolean nninterpolation)
-    {
-        
-        convertMaps_0(map1.nativeObj, map2.nativeObj, dstmap1.nativeObj, dstmap2.nativeObj, dstmap1type, nninterpolation);
-        
-        return;
-    }
-
-    //javadoc: convertMaps(map1, map2, dstmap1, dstmap2, dstmap1type)
-    public static void convertMaps(Mat map1, Mat map2, Mat dstmap1, Mat dstmap2, int dstmap1type)
-    {
-        
-        convertMaps_1(map1.nativeObj, map2.nativeObj, dstmap1.nativeObj, dstmap2.nativeObj, dstmap1type);
-        
-        return;
-    }
-
-
-    //
-    // C++:  Mat getRotationMatrix2D(Point2f center, double angle, double scale)
-    //
-
-    //javadoc: getRotationMatrix2D(center, angle, scale)
-    public static Mat getRotationMatrix2D(Point center, double angle, double scale)
-    {
-        
-        Mat retVal = new Mat(getRotationMatrix2D_0(center.x, center.y, angle, scale));
-        
-        return retVal;
-    }
-
-
-    //
-    // C++:  void invertAffineTransform(Mat M, Mat& iM)
-    //
-
-    //javadoc: invertAffineTransform(M, iM)
-    public static void invertAffineTransform(Mat M, Mat iM)
-    {
-        
-        invertAffineTransform_0(M.nativeObj, iM.nativeObj);
-        
-        return;
-    }
-
-
-    //
-    // C++:  Mat getPerspectiveTransform(Mat src, Mat dst)
-    //
-
-    //javadoc: getPerspectiveTransform(src, dst)
-    public static Mat getPerspectiveTransform(Mat src, Mat dst)
-    {
-        
-        Mat retVal = new Mat(getPerspectiveTransform_0(src.nativeObj, dst.nativeObj));
-        
-        return retVal;
-    }
-
-
-    //
-    // C++:  Mat getAffineTransform(vector_Point2f src, vector_Point2f dst)
-    //
-
-    //javadoc: getAffineTransform(src, dst)
-    public static Mat getAffineTransform(MatOfPoint2f src, MatOfPoint2f dst)
-    {
-        Mat src_mat = src;
-        Mat dst_mat = dst;
-        Mat retVal = new Mat(getAffineTransform_0(src_mat.nativeObj, dst_mat.nativeObj));
-        
-        return retVal;
-    }
-
-
-    //
-    // C++:  void getRectSubPix(Mat image, Size patchSize, Point2f center, Mat& patch, int patchType = -1)
-    //
-
-    //javadoc: getRectSubPix(image, patchSize, center, patch, patchType)
-    public static void getRectSubPix(Mat image, Size patchSize, Point center, Mat patch, int patchType)
-    {
-        
-        getRectSubPix_0(image.nativeObj, patchSize.width, patchSize.height, center.x, center.y, patch.nativeObj, patchType);
-        
-        return;
-    }
-
-    //javadoc: getRectSubPix(image, patchSize, center, patch)
-    public static void getRectSubPix(Mat image, Size patchSize, Point center, Mat patch)
-    {
-        
-        getRectSubPix_1(image.nativeObj, patchSize.width, patchSize.height, center.x, center.y, patch.nativeObj);
-        
-        return;
-    }
-
-
-    //
-    // C++:  void logPolar(Mat src, Mat& dst, Point2f center, double M, int flags)
-    //
-
-    //javadoc: logPolar(src, dst, center, M, flags)
-    public static void logPolar(Mat src, Mat dst, Point center, double M, int flags)
-    {
-        
-        logPolar_0(src.nativeObj, dst.nativeObj, center.x, center.y, M, flags);
-        
-        return;
-    }
-
-
-    //
-    // C++:  void linearPolar(Mat src, Mat& dst, Point2f center, double maxRadius, int flags)
-    //
-
-    //javadoc: linearPolar(src, dst, center, maxRadius, flags)
-    public static void linearPolar(Mat src, Mat dst, Point center, double maxRadius, int flags)
-    {
-        
-        linearPolar_0(src.nativeObj, dst.nativeObj, center.x, center.y, maxRadius, flags);
-        
-        return;
-    }
-
-
-    //
-    // C++:  void adaptiveThreshold(Mat src, Mat& dst, double maxValue, int adaptiveMethod, int thresholdType, int blockSize, double C)
-    //
-
-    //javadoc: adaptiveThreshold(src, dst, maxValue, adaptiveMethod, thresholdType, blockSize, C)
-    public static void adaptiveThreshold(Mat src, Mat dst, double maxValue, int adaptiveMethod, int thresholdType, int blockSize, double C)
-    {
-        
-        adaptiveThreshold_0(src.nativeObj, dst.nativeObj, maxValue, adaptiveMethod, thresholdType, blockSize, C);
-        
-        return;
-    }
-
-
-    //
-    // C++:  void pyrDown(Mat src, Mat& dst, Size dstsize = Size(), int borderType = BORDER_DEFAULT)
-    //
-
-    //javadoc: pyrDown(src, dst, dstsize, borderType)
-    public static void pyrDown(Mat src, Mat dst, Size dstsize, int borderType)
-    {
-        
-        pyrDown_0(src.nativeObj, dst.nativeObj, dstsize.width, dstsize.height, borderType);
-        
-        return;
-    }
-
-    //javadoc: pyrDown(src, dst, dstsize)
-    public static void pyrDown(Mat src, Mat dst, Size dstsize)
-    {
-        
-        pyrDown_1(src.nativeObj, dst.nativeObj, dstsize.width, dstsize.height);
-        
-        return;
-    }
-
-    //javadoc: pyrDown(src, dst)
-    public static void pyrDown(Mat src, Mat dst)
-    {
-        
-        pyrDown_2(src.nativeObj, dst.nativeObj);
-        
-        return;
-    }
-
-
-    //
-    // C++:  void pyrUp(Mat src, Mat& dst, Size dstsize = Size(), int borderType = BORDER_DEFAULT)
-    //
-
-    //javadoc: pyrUp(src, dst, dstsize, borderType)
-    public static void pyrUp(Mat src, Mat dst, Size dstsize, int borderType)
-    {
-        
-        pyrUp_0(src.nativeObj, dst.nativeObj, dstsize.width, dstsize.height, borderType);
-        
-        return;
-    }
-
-    //javadoc: pyrUp(src, dst, dstsize)
-    public static void pyrUp(Mat src, Mat dst, Size dstsize)
-    {
-        
-        pyrUp_1(src.nativeObj, dst.nativeObj, dstsize.width, dstsize.height);
-        
-        return;
-    }
-
-    //javadoc: pyrUp(src, dst)
-    public static void pyrUp(Mat src, Mat dst)
-    {
-        
-        pyrUp_2(src.nativeObj, dst.nativeObj);
-        
-        return;
-    }
-
-
-    //
-    // C++:  void undistort(Mat src, Mat& dst, Mat cameraMatrix, Mat distCoeffs, Mat newCameraMatrix = Mat())
-    //
-
-    //javadoc: undistort(src, dst, cameraMatrix, distCoeffs, newCameraMatrix)
-    public static void undistort(Mat src, Mat dst, Mat cameraMatrix, Mat distCoeffs, Mat newCameraMatrix)
-    {
-        
-        undistort_0(src.nativeObj, dst.nativeObj, cameraMatrix.nativeObj, distCoeffs.nativeObj, newCameraMatrix.nativeObj);
-        
-        return;
-    }
-
-    //javadoc: undistort(src, dst, cameraMatrix, distCoeffs)
-    public static void undistort(Mat src, Mat dst, Mat cameraMatrix, Mat distCoeffs)
-    {
-        
-        undistort_1(src.nativeObj, dst.nativeObj, cameraMatrix.nativeObj, distCoeffs.nativeObj);
-        
-        return;
-    }
-
-
-    //
-    // C++:  void initUndistortRectifyMap(Mat cameraMatrix, Mat distCoeffs, Mat R, Mat newCameraMatrix, Size size, int m1type, Mat& map1, Mat& map2)
-    //
-
-    //javadoc: initUndistortRectifyMap(cameraMatrix, distCoeffs, R, newCameraMatrix, size, m1type, map1, map2)
-    public static void initUndistortRectifyMap(Mat cameraMatrix, Mat distCoeffs, Mat R, Mat newCameraMatrix, Size size, int m1type, Mat map1, Mat map2)
-    {
-        
-        initUndistortRectifyMap_0(cameraMatrix.nativeObj, distCoeffs.nativeObj, R.nativeObj, newCameraMatrix.nativeObj, size.width, size.height, m1type, map1.nativeObj, map2.nativeObj);
-        
-        return;
-    }
-
-
-    //
-    // C++:  float initWideAngleProjMap(Mat cameraMatrix, Mat distCoeffs, Size imageSize, int destImageWidth, int m1type, Mat& map1, Mat& map2, int projType = PROJ_SPHERICAL_EQRECT, double alpha = 0)
-    //
-
-    //javadoc: initWideAngleProjMap(cameraMatrix, distCoeffs, imageSize, destImageWidth, m1type, map1, map2, projType, alpha)
-    public static float initWideAngleProjMap(Mat cameraMatrix, Mat distCoeffs, Size imageSize, int destImageWidth, int m1type, Mat map1, Mat map2, int projType, double alpha)
-    {
-        
-        float retVal = initWideAngleProjMap_0(cameraMatrix.nativeObj, distCoeffs.nativeObj, imageSize.width, imageSize.height, destImageWidth, m1type, map1.nativeObj, map2.nativeObj, projType, alpha);
-        
-        return retVal;
-    }
-
-    //javadoc: initWideAngleProjMap(cameraMatrix, distCoeffs, imageSize, destImageWidth, m1type, map1, map2)
-    public static float initWideAngleProjMap(Mat cameraMatrix, Mat distCoeffs, Size imageSize, int destImageWidth, int m1type, Mat map1, Mat map2)
-    {
-        
-        float retVal = initWideAngleProjMap_1(cameraMatrix.nativeObj, distCoeffs.nativeObj, imageSize.width, imageSize.height, destImageWidth, m1type, map1.nativeObj, map2.nativeObj);
-        
-        return retVal;
-    }
-
-
-    //
-    // C++:  Mat getDefaultNewCameraMatrix(Mat cameraMatrix, Size imgsize = Size(), bool centerPrincipalPoint = false)
-    //
-
-    //javadoc: getDefaultNewCameraMatrix(cameraMatrix, imgsize, centerPrincipalPoint)
-    public static Mat getDefaultNewCameraMatrix(Mat cameraMatrix, Size imgsize, boolean centerPrincipalPoint)
-    {
-        
-        Mat retVal = new Mat(getDefaultNewCameraMatrix_0(cameraMatrix.nativeObj, imgsize.width, imgsize.height, centerPrincipalPoint));
-        
-        return retVal;
-    }
-
-    //javadoc: getDefaultNewCameraMatrix(cameraMatrix)
-    public static Mat getDefaultNewCameraMatrix(Mat cameraMatrix)
-    {
-        
-        Mat retVal = new Mat(getDefaultNewCameraMatrix_1(cameraMatrix.nativeObj));
-        
-        return retVal;
-    }
-
-
-    //
-    // C++:  void integral(Mat src, Mat& sum, int sdepth = -1)
-    //
-
-    //javadoc: integral(src, sum, sdepth)
-    public static void integral(Mat src, Mat sum, int sdepth)
-    {
-        
-        integral_0(src.nativeObj, sum.nativeObj, sdepth);
-        
-        return;
-    }
-
-    //javadoc: integral(src, sum)
-    public static void integral(Mat src, Mat sum)
-    {
-        
-        integral_1(src.nativeObj, sum.nativeObj);
-        
-        return;
-    }
-
-
-    //
-    // C++:  void integral(Mat src, Mat& sum, Mat& sqsum, int sdepth = -1, int sqdepth = -1)
-    //
-
-    //javadoc: integral(src, sum, sqsum, sdepth, sqdepth)
-    public static void integral2(Mat src, Mat sum, Mat sqsum, int sdepth, int sqdepth)
-    {
-        
-        integral2_0(src.nativeObj, sum.nativeObj, sqsum.nativeObj, sdepth, sqdepth);
-        
-        return;
-    }
-
-    //javadoc: integral(src, sum, sqsum)
-    public static void integral2(Mat src, Mat sum, Mat sqsum)
-    {
-        
-        integral2_1(src.nativeObj, sum.nativeObj, sqsum.nativeObj);
-        
-        return;
-    }
-
-
-    //
-    // C++:  void integral(Mat src, Mat& sum, Mat& sqsum, Mat& tilted, int sdepth = -1, int sqdepth = -1)
-    //
-
-    //javadoc: integral(src, sum, sqsum, tilted, sdepth, sqdepth)
-    public static void integral3(Mat src, Mat sum, Mat sqsum, Mat tilted, int sdepth, int sqdepth)
-    {
-        
-        integral3_0(src.nativeObj, sum.nativeObj, sqsum.nativeObj, tilted.nativeObj, sdepth, sqdepth);
-        
-        return;
-    }
-
-    //javadoc: integral(src, sum, sqsum, tilted)
-    public static void integral3(Mat src, Mat sum, Mat sqsum, Mat tilted)
-    {
-        
-        integral3_1(src.nativeObj, sum.nativeObj, sqsum.nativeObj, tilted.nativeObj);
-        
-        return;
-    }
-
-
-    //
-    // C++:  void accumulate(Mat src, Mat& dst, Mat mask = Mat())
-    //
-
-    //javadoc: accumulate(src, dst, mask)
-    public static void accumulate(Mat src, Mat dst, Mat mask)
-    {
-        
-        accumulate_0(src.nativeObj, dst.nativeObj, mask.nativeObj);
-        
-        return;
-    }
-
-    //javadoc: accumulate(src, dst)
-    public static void accumulate(Mat src, Mat dst)
-    {
-        
-        accumulate_1(src.nativeObj, dst.nativeObj);
-        
-        return;
-    }
-
-
-    //
-    // C++:  void accumulateSquare(Mat src, Mat& dst, Mat mask = Mat())
-    //
-
-    //javadoc: accumulateSquare(src, dst, mask)
-    public static void accumulateSquare(Mat src, Mat dst, Mat mask)
-    {
-        
-        accumulateSquare_0(src.nativeObj, dst.nativeObj, mask.nativeObj);
-        
-        return;
-    }
-
-    //javadoc: accumulateSquare(src, dst)
-    public static void accumulateSquare(Mat src, Mat dst)
-    {
-        
-        accumulateSquare_1(src.nativeObj, dst.nativeObj);
-        
-        return;
-    }
-
-
-    //
-    // C++:  void accumulateProduct(Mat src1, Mat src2, Mat& dst, Mat mask = Mat())
-    //
-
-    //javadoc: accumulateProduct(src1, src2, dst, mask)
-    public static void accumulateProduct(Mat src1, Mat src2, Mat dst, Mat mask)
-    {
-        
-        accumulateProduct_0(src1.nativeObj, src2.nativeObj, dst.nativeObj, mask.nativeObj);
-        
-        return;
-    }
-
-    //javadoc: accumulateProduct(src1, src2, dst)
-    public static void accumulateProduct(Mat src1, Mat src2, Mat dst)
-    {
-        
-        accumulateProduct_1(src1.nativeObj, src2.nativeObj, dst.nativeObj);
-        
-        return;
-    }
-
-
-    //
-    // C++:  void accumulateWeighted(Mat src, Mat& dst, double alpha, Mat mask = Mat())
-    //
-
-    //javadoc: accumulateWeighted(src, dst, alpha, mask)
-    public static void accumulateWeighted(Mat src, Mat dst, double alpha, Mat mask)
-    {
-        
-        accumulateWeighted_0(src.nativeObj, dst.nativeObj, alpha, mask.nativeObj);
-        
-        return;
-    }
-
-    //javadoc: accumulateWeighted(src, dst, alpha)
-    public static void accumulateWeighted(Mat src, Mat dst, double alpha)
-    {
-        
-        accumulateWeighted_1(src.nativeObj, dst.nativeObj, alpha);
-        
-        return;
-    }
-
-
-    //
-    // C++:  Point2d phaseCorrelate(Mat src1, Mat src2, Mat window = Mat(), double* response = 0)
-    //
-
-    //javadoc: phaseCorrelate(src1, src2, window, response)
-    public static Point phaseCorrelate(Mat src1, Mat src2, Mat window, double[] response)
-    {
-        double[] response_out = new double[1];
-        Point retVal = new Point(phaseCorrelate_0(src1.nativeObj, src2.nativeObj, window.nativeObj, response_out));
-        if(response!=null) response[0] = (double)response_out[0];
-        return retVal;
-    }
-
-    //javadoc: phaseCorrelate(src1, src2)
-    public static Point phaseCorrelate(Mat src1, Mat src2)
-    {
-        
-        Point retVal = new Point(phaseCorrelate_1(src1.nativeObj, src2.nativeObj));
-        
-        return retVal;
-    }
-
-
-    //
-    // C++:  void createHanningWindow(Mat& dst, Size winSize, int type)
-    //
-
-    //javadoc: createHanningWindow(dst, winSize, type)
-    public static void createHanningWindow(Mat dst, Size winSize, int type)
-    {
-        
-        createHanningWindow_0(dst.nativeObj, winSize.width, winSize.height, type);
-        
-        return;
-    }
-
-
-    //
-    // C++:  double threshold(Mat src, Mat& dst, double thresh, double maxval, int type)
-    //
-
-    //javadoc: threshold(src, dst, thresh, maxval, type)
-    public static double threshold(Mat src, Mat dst, double thresh, double maxval, int type)
-    {
-        
-        double retVal = threshold_0(src.nativeObj, dst.nativeObj, thresh, maxval, type);
-        
-        return retVal;
-    }
-
-
-    //
-    // C++:  void undistortPoints(vector_Point2f src, vector_Point2f& dst, Mat cameraMatrix, Mat distCoeffs, Mat R = Mat(), Mat P = Mat())
-    //
-
-    //javadoc: undistortPoints(src, dst, cameraMatrix, distCoeffs, R, P)
-    public static void undistortPoints(MatOfPoint2f src, MatOfPoint2f dst, Mat cameraMatrix, Mat distCoeffs, Mat R, Mat P)
-    {
-        Mat src_mat = src;
-        Mat dst_mat = dst;
-        undistortPoints_0(src_mat.nativeObj, dst_mat.nativeObj, cameraMatrix.nativeObj, distCoeffs.nativeObj, R.nativeObj, P.nativeObj);
-        
-        return;
-    }
-
-    //javadoc: undistortPoints(src, dst, cameraMatrix, distCoeffs)
-    public static void undistortPoints(MatOfPoint2f src, MatOfPoint2f dst, Mat cameraMatrix, Mat distCoeffs)
-    {
-        Mat src_mat = src;
-        Mat dst_mat = dst;
-        undistortPoints_1(src_mat.nativeObj, dst_mat.nativeObj, cameraMatrix.nativeObj, distCoeffs.nativeObj);
-        
-        return;
-    }
-
-
-    //
-    // C++:  void calcHist(vector_Mat images, vector_int channels, Mat mask, Mat& hist, vector_int histSize, vector_float ranges, bool accumulate = false)
-    //
-
-    //javadoc: calcHist(images, channels, mask, hist, histSize, ranges, accumulate)
-    public static void calcHist(List<Mat> images, MatOfInt channels, Mat mask, Mat hist, MatOfInt histSize, MatOfFloat ranges, boolean accumulate)
-    {
-        Mat images_mat = Converters.vector_Mat_to_Mat(images);
-        Mat channels_mat = channels;
-        Mat histSize_mat = histSize;
-        Mat ranges_mat = ranges;
-        calcHist_0(images_mat.nativeObj, channels_mat.nativeObj, mask.nativeObj, hist.nativeObj, histSize_mat.nativeObj, ranges_mat.nativeObj, accumulate);
-        
-        return;
-    }
-
-    //javadoc: calcHist(images, channels, mask, hist, histSize, ranges)
-    public static void calcHist(List<Mat> images, MatOfInt channels, Mat mask, Mat hist, MatOfInt histSize, MatOfFloat ranges)
-    {
-        Mat images_mat = Converters.vector_Mat_to_Mat(images);
-        Mat channels_mat = channels;
-        Mat histSize_mat = histSize;
-        Mat ranges_mat = ranges;
-        calcHist_1(images_mat.nativeObj, channels_mat.nativeObj, mask.nativeObj, hist.nativeObj, histSize_mat.nativeObj, ranges_mat.nativeObj);
-        
-        return;
-    }
-
-
-    //
-    // C++:  void calcBackProject(vector_Mat images, vector_int channels, Mat hist, Mat& dst, vector_float ranges, double scale)
-    //
-
-    //javadoc: calcBackProject(images, channels, hist, dst, ranges, scale)
-    public static void calcBackProject(List<Mat> images, MatOfInt channels, Mat hist, Mat dst, MatOfFloat ranges, double scale)
-    {
-        Mat images_mat = Converters.vector_Mat_to_Mat(images);
-        Mat channels_mat = channels;
-        Mat ranges_mat = ranges;
-        calcBackProject_0(images_mat.nativeObj, channels_mat.nativeObj, hist.nativeObj, dst.nativeObj, ranges_mat.nativeObj, scale);
-        
-        return;
-    }
-
-
-    //
-    // C++:  double compareHist(Mat H1, Mat H2, int method)
-    //
-
-    //javadoc: compareHist(H1, H2, method)
-    public static double compareHist(Mat H1, Mat H2, int method)
-    {
-        
-        double retVal = compareHist_0(H1.nativeObj, H2.nativeObj, method);
-        
-        return retVal;
-    }
-
-
-    //
-    // C++:  void equalizeHist(Mat src, Mat& dst)
-    //
-
-    //javadoc: equalizeHist(src, dst)
-    public static void equalizeHist(Mat src, Mat dst)
-    {
-        
-        equalizeHist_0(src.nativeObj, dst.nativeObj);
-        
-        return;
-    }
-
-
-    //
-    // C++:  void watershed(Mat image, Mat& markers)
-    //
-
-    //javadoc: watershed(image, markers)
-    public static void watershed(Mat image, Mat markers)
-    {
-        
-        watershed_0(image.nativeObj, markers.nativeObj);
-        
-        return;
-    }
-
-
-    //
-    // C++:  void pyrMeanShiftFiltering(Mat src, Mat& dst, double sp, double sr, int maxLevel = 1, TermCriteria termcrit = TermCriteria(TermCriteria::MAX_ITER+TermCriteria::EPS,5,1))
-    //
-
-    //javadoc: pyrMeanShiftFiltering(src, dst, sp, sr, maxLevel, termcrit)
-    public static void pyrMeanShiftFiltering(Mat src, Mat dst, double sp, double sr, int maxLevel, TermCriteria termcrit)
-    {
-        
-        pyrMeanShiftFiltering_0(src.nativeObj, dst.nativeObj, sp, sr, maxLevel, termcrit.type, termcrit.maxCount, termcrit.epsilon);
-        
-        return;
-    }
-
-    //javadoc: pyrMeanShiftFiltering(src, dst, sp, sr)
-    public static void pyrMeanShiftFiltering(Mat src, Mat dst, double sp, double sr)
-    {
-        
-        pyrMeanShiftFiltering_1(src.nativeObj, dst.nativeObj, sp, sr);
-        
-        return;
-    }
-
-
-    //
-    // C++:  void grabCut(Mat img, Mat& mask, Rect rect, Mat& bgdModel, Mat& fgdModel, int iterCount, int mode = GC_EVAL)
-    //
-
-    //javadoc: grabCut(img, mask, rect, bgdModel, fgdModel, iterCount, mode)
-    public static void grabCut(Mat img, Mat mask, Rect rect, Mat bgdModel, Mat fgdModel, int iterCount, int mode)
-    {
-        
-        grabCut_0(img.nativeObj, mask.nativeObj, rect.x, rect.y, rect.width, rect.height, bgdModel.nativeObj, fgdModel.nativeObj, iterCount, mode);
-        
-        return;
-    }
-
-    //javadoc: grabCut(img, mask, rect, bgdModel, fgdModel, iterCount)
-    public static void grabCut(Mat img, Mat mask, Rect rect, Mat bgdModel, Mat fgdModel, int iterCount)
-    {
-        
-        grabCut_1(img.nativeObj, mask.nativeObj, rect.x, rect.y, rect.width, rect.height, bgdModel.nativeObj, fgdModel.nativeObj, iterCount);
-        
-        return;
-    }
-
-
-    //
-    // C++:  void distanceTransform(Mat src, Mat& dst, Mat& labels, int distanceType, int maskSize, int labelType = DIST_LABEL_CCOMP)
-    //
-
-    //javadoc: distanceTransform(src, dst, labels, distanceType, maskSize, labelType)
-    public static void distanceTransformWithLabels(Mat src, Mat dst, Mat labels, int distanceType, int maskSize, int labelType)
-    {
-        
-        distanceTransformWithLabels_0(src.nativeObj, dst.nativeObj, labels.nativeObj, distanceType, maskSize, labelType);
-        
-        return;
-    }
-
-    //javadoc: distanceTransform(src, dst, labels, distanceType, maskSize)
-    public static void distanceTransformWithLabels(Mat src, Mat dst, Mat labels, int distanceType, int maskSize)
-    {
-        
-        distanceTransformWithLabels_1(src.nativeObj, dst.nativeObj, labels.nativeObj, distanceType, maskSize);
-        
-        return;
-    }
-
-
-    //
-    // C++:  void distanceTransform(Mat src, Mat& dst, int distanceType, int maskSize, int dstType = CV_32F)
-    //
-
-    //javadoc: distanceTransform(src, dst, distanceType, maskSize, dstType)
-    public static void distanceTransform(Mat src, Mat dst, int distanceType, int maskSize, int dstType)
-    {
-        
-        distanceTransform_0(src.nativeObj, dst.nativeObj, distanceType, maskSize, dstType);
-        
-        return;
-    }
-
-    //javadoc: distanceTransform(src, dst, distanceType, maskSize)
-    public static void distanceTransform(Mat src, Mat dst, int distanceType, int maskSize)
-    {
-        
-        distanceTransform_1(src.nativeObj, dst.nativeObj, distanceType, maskSize);
-        
-        return;
-    }
-
-
-    //
-    // C++:  int floodFill(Mat& image, Mat& mask, Point seedPoint, Scalar newVal, Rect* rect = 0, Scalar loDiff = Scalar(), Scalar upDiff = Scalar(), int flags = 4)
-    //
-
-    //javadoc: floodFill(image, mask, seedPoint, newVal, rect, loDiff, upDiff, flags)
-    public static int floodFill(Mat image, Mat mask, Point seedPoint, Scalar newVal, Rect rect, Scalar loDiff, Scalar upDiff, int flags)
-    {
-        double[] rect_out = new double[4];
-        int retVal = floodFill_0(image.nativeObj, mask.nativeObj, seedPoint.x, seedPoint.y, newVal.val[0], newVal.val[1], newVal.val[2], newVal.val[3], rect_out, loDiff.val[0], loDiff.val[1], loDiff.val[2], loDiff.val[3], upDiff.val[0], upDiff.val[1], upDiff.val[2], upDiff.val[3], flags);
-        if(rect!=null){ rect.x = (int)rect_out[0]; rect.y = (int)rect_out[1]; rect.width = (int)rect_out[2]; rect.height = (int)rect_out[3]; } 
-        return retVal;
-    }
-
-    //javadoc: floodFill(image, mask, seedPoint, newVal)
-    public static int floodFill(Mat image, Mat mask, Point seedPoint, Scalar newVal)
-    {
-        
-        int retVal = floodFill_1(image.nativeObj, mask.nativeObj, seedPoint.x, seedPoint.y, newVal.val[0], newVal.val[1], newVal.val[2], newVal.val[3]);
-        
-        return retVal;
-    }
-
-
-    //
-    // C++:  void cvtColor(Mat src, Mat& dst, int code, int dstCn = 0)
-    //
-
-    //javadoc: cvtColor(src, dst, code, dstCn)
-    public static void cvtColor(Mat src, Mat dst, int code, int dstCn)
-    {
-        
-        cvtColor_0(src.nativeObj, dst.nativeObj, code, dstCn);
-        
-        return;
-    }
-
-    //javadoc: cvtColor(src, dst, code)
-    public static void cvtColor(Mat src, Mat dst, int code)
-    {
-        
-        cvtColor_1(src.nativeObj, dst.nativeObj, code);
-        
-        return;
-    }
-
-
-    //
-    // C++:  void demosaicing(Mat _src, Mat& _dst, int code, int dcn = 0)
-    //
-
-    //javadoc: demosaicing(_src, _dst, code, dcn)
-    public static void demosaicing(Mat _src, Mat _dst, int code, int dcn)
-    {
-        
-        demosaicing_0(_src.nativeObj, _dst.nativeObj, code, dcn);
-        
-        return;
-    }
-
-    //javadoc: demosaicing(_src, _dst, code)
-    public static void demosaicing(Mat _src, Mat _dst, int code)
-    {
-        
-        demosaicing_1(_src.nativeObj, _dst.nativeObj, code);
-        
-        return;
-    }
-
-
-    //
-    // C++:  Moments moments(Mat array, bool binaryImage = false)
-    //
-
-    // Return type 'Moments' is not supported, skipping the function
-
-
-    //
-    // C++:  void HuMoments(Moments m, Mat& h
+/*====================================================================*
+ -  Copyright (C) 2001 Leptonica.  All rights reserved.
+ -
+ -  Redistribution and use in source and binary forms, with or without
+ -  modification, are permitted provided that the following conditions
+ -  are met:
+ -  1. Redistributions of source code must retain the above copyright
+ -     notice, this list of conditions and the following disclaimer.
+ -  2. Redistributions in binary form must reproduce the above
+ -     copyright notice, this list of conditions and the following
+ -     disclaimer in the documentation and/or other materials
+ -     provided with the distribution.
+ -
+ -  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ -  ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ -  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ -  A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL ANY
+ -  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ -  EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ -  PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+ -  PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
+ -  OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ -  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ -  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *====================================================================*/
+
+/*
+ *  projective.c
+ *
+ *      Projective (4 pt) image transformation using a sampled
+ *      (to nearest integer) transform on each dest point
+ *           PIX      *pixProjectiveSampledPta()
+ *           PIX      *pixProjectiveSampled()
+ *
+ *      Projective (4 pt) image transformation using interpolation
+ *      (or area mapping) for anti-aliasing images that are
+ *      2, 4, or 8 bpp gray, or colormapped, or 32 bpp RGB
+ *           PIX      *pixProjectivePta()
+ *           PIX      *pixProjective()
+ *           PIX      *pixProjectivePtaColor()
+ *           PIX      *pixProjectiveColor()
+ *           PIX      *pixProjectivePtaGray()
+ *           PIX      *pixProjectiveGray()
+ *
+ *      Projective transform including alpha (blend) component
+ *           PIX      *pixProjectivePtaWithAlpha()
+ *
+ *      Projective coordinate transformation
+ *           l_int32   getProjectiveXformCoeffs()
+ *           l_int32   projectiveXformSampledPt()
+ *           l_int32   projectiveXformPt()
+ *
+ *      A projective transform can be specified as a specific functional
+ *      mapping between 4 points in the source and 4 points in the dest.
+ *      It preserves straight lines, but is less stable than a bilinear
+ *      transform, because it contains a division by a quantity that
+ *      can get arbitrarily small.)
+ *
+ *      We give both a projective coordinate transformation and
+ *      two projective image transformations.
+ *
+ *      For the former, we ask for the coordinate value (x',y')
+ *      in the transformed space for any point (x,y) in the original
+ *      space.  The coefficients of the transformation are found by
+ *      solving 8 simultaneous equations for the 8 coordinates of
+ *      the 4 points in src and dest.  The transformation can then
+ *      be used to compute the associated image transform, by
+ *      computing, for each dest pixel, the relevant pixel(s) in
+ *      the source.  This can be done either by taking the closest
+ *      src pixel to each transformed dest pixel ("sampling") or
+ *      by doing an interpolation and averaging over 4 source
+ *      pixels with appropriate weightings ("interpolated").
+ *
+ *      A typical application would be to remove keystoning
+ *      due to a projective transform in the imaging system.
+ *
+ *      The projective transform is given by specifying two equations:
+ *
+ *          x' = (ax + by + c) / (gx + hy + 1)
+ *          y' = (dx + ey + f) / (gx + hy + 1)
+ *
+ *      where the eight coefficients have been computed from four
+ *      sets of these equations, each for two corresponding data pts.
+ *      In practice, once the coefficients are known, we use the
+ *      equations "backwards": for each point (x,y) in the dest image,
+ *      these two equations are used to compute the corresponding point
+ *      (x',y') in the src.  That computed point in the src is then used
+ *      to determine the corresponding dest pixel value in one of two ways:
+ *
+ *       - sampling: simply take the value of the src pixel in which this
+ *                   point falls
+ *       - interpolation: take appropriate linear combinations of the
+ *                        four src pixels that this dest pixel would
+ *                        overlap, with the coefficients proportional
+ *                        to the amount of overlap
+ *
+ *      For small warp where there is little scale change, (e.g.,
+ *      for rotation) area mapping is nearly equivalent to interpolation.
+ *
+ *      Typical relative timing of pointwise transforms (sampled = 1.0):
+ *      8 bpp:   sampled        1.0
+ *               interpolated   1.5
+ *      32 bpp:  sampled        1.0
+ *               interpolated   1.6
+ *      Additionally, the computation time/pixel is nearly the same
+ *      for 8 bpp and 32 bpp, for both sampled and interpolated.
+ */
+
+#include <string.h>
+#include <math.h>
+#include "allheaders.h"
+
+extern l_float32  AlphaMaskBorderVals[2];
+
+
+/*------------------------------------------------------------n
+ *            Sampled projective image transformation          *
+ *-------------------------------------------------------------*/
+/*!
+ *  pixProjectiveSampledPta()
+ *
+ *      Input:  pixs (all depths)
+ *              ptad  (4 pts of final coordinate space)
+ *              ptas  (4 pts of initial coordinate space)
+ *              incolor (L_BRING_IN_WHITE, L_BRING_IN_BLACK)
+ *      Return: pixd, or null on error
+ *
+ *  Notes:
+ *      (1) Brings in either black or white pixels from the boundary.
+ *      (2) Retains colormap, which you can do for a sampled transform..
+ *      (3) No 3 of the 4 points may be collinear.
+ *      (4) For 8 and 32 bpp pix, better quality is obtained by the
+ *          somewhat slower pixProjectivePta().  See that
+ *          function for relative timings between sampled and interpolated.
+ */
+PIX *
+pixProjectiveSampledPta(PIX     *pixs,
+                        PTA     *ptad,
+                        PTA     *ptas,
+                        l_int32  incolor)
+{
+l_float32  *vc;
+PIX        *pixd;
+
+    PROCNAME("pixProjectiveSampledPta");
+
+    if (!pixs)
+        return (PIX *)ERROR_PTR("pixs not defined", procName, NULL);
+    if (!ptas)
+        return (PIX *)ERROR_PTR("ptas not defined", procName, NULL);
+    if (!ptad)
+        return (PIX *)ERROR_PTR("ptad not defined", procName, NULL);
+    if (incolor != L_BRING_IN_WHITE && incolor != L_BRING_IN_BLACK)
+        return (PIX *)ERROR_PTR("invalid incolor", procName, NULL);
+    if (ptaGetCount(ptas) != 4)
+        return (PIX *)ERROR_PTR("ptas count not 4", procName, NULL);
+    if (ptaGetCount(ptad) != 4)
+        return (PIX *)ERROR_PTR("ptad count not 4", procName, NULL);
+
+        /* Get backwards transform from dest to src, and apply it */
+    getProjectiveXformCoeffs(ptad, ptas, &vc);
+    pixd = pixProjectiveSampled(pixs, vc, incolor);
+    FREE(vc);
+
+    return pixd;
+}
+
+
+/*!
+ *  pixProjectiveSampled()
+ *
+ *      Input:  pixs (all depths)
+ *              vc  (vector of 8 coefficients for projective transformation)
+ *              incolor (L_BRING_IN_WHITE, L_BRING_IN_BLACK)
+ *      Return: pixd, or null on error
+ *
+ *  Notes:
+ *      (1) Brings in either black or white pixels from the boundary.
+ *      (2) Retains colormap, which you can do for a sampled transform..
+ *      (3) For 8 or 32 bpp, much better quality is obtained by the
+ *          somewhat slower pixProjective().  See that function
+ *          for relative timings between sampled and interpolated.
+ */
+PIX *
+pixProjectiveSampled(PIX        *pixs,
+                     l_float32  *vc,
+                     l_int32     incolor)
+{
+l_int32     i, j, w, h, d, x, y, wpls, wpld, color, cmapindex;
+l_uint32    val;
+l_uint32   *datas, *datad, *lines, *lined;
+PIX        *pixd;
+PIXCMAP    *cmap;
+
+    PROCNAME("pixProjectiveSampled");
+
+    if (!pixs)
+        return (PIX *)ERROR_PTR("pixs not defined", procName, NULL);
+    if (!vc)
+        return (PIX *)ERROR_PTR("vc not defined", procName, NULL);
+    if (incolor != L_BRING_IN_WHITE && incolor != L_BRING_IN_BLACK)
+        return (PIX *)ERROR_PTR("invalid incolor", procName, NULL);
+    pixGetDimensions(pixs, &w, &h, &d);
+    if (d != 1 && d != 2 && d != 4 && d != 8 && d != 32)
+        return (PIX *)ERROR_PTR("depth not 1, 2, 4, 8 or 16", procName, NULL);
+
+        /* Init all dest pixels to color to be brought in from outside */
+    pixd = pixCreateTemplate(pixs);
+    if ((cmap = pixGetColormap(pixs)) != NULL) {
+        if (incolor == L_BRING_IN_WHITE)
+            color = 1;
+        else
+            color = 0;
+        pixcmapAddBlackOrWhite(cmap, color, &cmapindex);
+        pixSetAllArbitrary(pixd, cmapindex);
+    } else {
+        if ((d == 1 && incolor == L_BRING_IN_WHITE) ||
+            (d > 1 && incolor == L_BRING_IN_BLACK)) {
+            pixClearAll(pixd);
+        } else {
+            pixSetAll(pixd);
+        }
+    }
+
+        /* Scan over the dest pixels */
+    datas = pixGetData(pixs);
+    wpls = pixGetWpl(pixs);
+    datad = pixGetData(pixd);
+    wpld = pixGetWpl(pixd);
+    for (i = 0; i < h; i++) {
+        lined = datad + i * wpld;
+        for (j = 0; j < w; j++) {
+            projectiveXformSampledPt(vc, j, i, &x, &y);
+            if (x < 0 || y < 0 || x >=w || y >= h)
+                continue;
+            lines = datas + y * wpls;
+            if (d == 1) {
+                val = GET_DATA_BIT(lines, x);
+                SET_DATA_BIT_VAL(lined, j, val);
+            } else if (d == 8) {
+                val = GET_DATA_BYTE(lines, x);
+                SET_DATA_BYTE(lined, j, val);
+            } else if (d == 32) {
+                lined[j] = lines[x];
+            } else if (d == 2) {
+                val = GET_DATA_DIBIT(lines, x);
+                SET_DATA_DIBIT(lined, j, val);
+            } else if (d == 4) {
+                val = GET_DATA_QBIT(lines, x);
+                SET_DATA_QBIT(lined, j, val);
+            }
+        }
+    }
+
+    return pixd;
+}
+
+
+/*---------------------------------------------------------------------*
+ *            Interpolated projective image transformation             *
+ *---------------------------------------------------------------------*/
+/*!
+ *  pixProjectivePta()
+ *
+ *      Input:  pixs (all depths; colormap ok)
+ *              ptad  (4 pts of final coordinate space)
+ *              ptas  (4 pts of initial coordinate space)
+ *              incolor (L_BRING_IN_WHITE, L_BRING_IN_BLACK)
+ *      Return: pixd, or null on error
+ *
+ *  Notes:
+ *      (1) Brings in either black or white pixels from the boundary
+ *      (2) Removes any existing colormap, if necessary, before transforming
+ */
+PIX *
+pixProjectivePta(PIX     *pixs,
+                 PTA     *ptad,
+                 PTA     *ptas,
+                 l_int32  incolor)
+{
+l_int32   d;
+l_uint32  colorval;
+PIX      *pixt1, *pixt2, *pixd;
+
+    PROCNAME("pixProjectivePta");
+
+    if (!pixs)
+        return (PIX *)ERROR_PTR("pixs not defined", procName, NULL);
+    if (!ptas)
+        return (PIX *)ERROR_PTR("ptas not defined", procName, NULL);
+    if (!ptad)
+        return (PIX *)ERROR_PTR("ptad not defined", procName, NULL);
+    if (incolor != L_BRING_IN_WHITE && incolor != L_BRING_IN_BLACK)
+        return (PIX *)ERROR_PTR("invalid incolor", procName, NULL);
+    if (ptaGetCount(ptas) != 4)
+        return (PIX *)ERROR_PTR("ptas count not 4", procName, NULL);
+    if (ptaGetCount(ptad) != 4)
+        return (PIX *)ERROR_PTR("ptad count not 4", procName, NULL);
+
+    if (pixGetDepth(pixs) == 1)
+        return pixProjectiveSampledPta(pixs, ptad, ptas, incolor);
+
+        /* Remove cmap if it exists, and unpack to 8 bpp if necessary */
+    pixt1 = pixRemoveColormap(pixs, REMOVE_CMAP_BASED_ON_SRC);
+    d = pixGetDepth(pixt1);
+    if (d < 8)
+        pixt2 = pixConvertTo8(pixt1, FALSE);
+    else
+        pixt2 = pixClone(pixt1);
+    d = pixGetDepth(pixt2);
+
+        /* Compute actual color to bring in from edges */
+    colorval = 0;
+    if (incolor == L_BRING_IN_WHITE) {
+        if (d == 8)
+            colorval = 255;
+        else  /* d == 32 */
+            colorval = 0xffffff00;
+    }
+
+    if (d == 8)
+        pixd = pixProjectivePtaGray(pixt2, ptad, ptas, colorval);
+    else  /* d == 32 */
+        pixd = pixProjectivePtaColor(pixt2, ptad, ptas, colorval);
+    pixDestroy(&pixt1);
+    pixDestroy(&pixt2);
+    return pixd;
+}
+
+
+/*!
+ *  pixProjective()
+ *
+ *      Input:  pixs (all depths; colormap ok)
+ *              vc  (vector of 8 coefficients for projective transformation)
+ *              incolor (L_BRING_IN_WHITE, L_BRING_IN_BLACK)
+ *      Return: pixd, or null on error
+ *
+ *  Notes:
+ *      (1) Brings in either black or white pixels from the boundary
+ *      (2) Removes any existing colormap, if necessary, before transforming
+ */
+PIX *
+pixProjective(PIX        *pixs,
+              l_float32  *vc,
+              l_int32     incolor)
+{
+l_int32   d;
+l_uint32  colorval;
+PIX      *pixt1, *pixt2, *pixd;
+
+    PROCNAME("pixProjective");
+
+    if (!pixs)
+        return (PIX *)ERROR_PTR("pixs not defined", procName, NULL);
+    if (!vc)
+        return (PIX *)ERROR_PTR("vc not defined", procName, NULL);
+
+    if (pixGetDepth(pixs) == 1)
+        return pixProjectiveSampled(pixs, vc, incolor);
+
+        /* Remove cmap if it exists, and unpack to 8 bpp if necessary */
+    pixt1 = pixRemoveColormap(pixs, REMOVE_CMAP_BASED_ON_SRC);
+    d = pixGetDepth(pixt1);
+    if (d < 8)
+        pixt2 = pixConvertTo8(pixt1, FALSE);
+    else
+        pixt2 = pixClone(pixt1);
+    d = pixGetDepth(pixt2);
+
+        /* Compute actual color to bring in from edges */
+    colorval = 0;
+    if (incolor == L_BRING_IN_WHITE) {
+        if (d == 8)
+            colorval = 255;
+        else  /* d == 32 */
+            colorval = 0xffffff00;
+    }
+
+    if (d == 8)
+        pixd = pixProjectiveGray(pixt2, vc, colorval);
+    else  /* d == 32 */
+        pixd = pixProjectiveColor(pixt2, vc, colorval);
+    pixDestroy(&pixt1);
+    pixDestroy(&pixt2);
+    return pixd;
+}
+
+
+/*!
+ *  pixProjectivePtaColor()
+ *
+ *      Input:  pixs (32 bpp)
+ *              ptad  (4 pts of final coordinate space)
+ *              ptas  (4 pts of initial coordinate space)
+ *              colorval (e.g., 0 to bring in BLACK, 0xffffff00 for WHITE)
+ *      Return: pixd, or null on error
+ */
+PIX *
+pixProjectivePtaColor(PIX      *pixs,
+                      PTA      *ptad,
+                      PTA      *ptas,
+                      l_uint32  colorval)
+{
+l_float32  *vc;
+PIX        *pixd;
+
+    PROCNAME("pixProjectivePtaColor");
+
+    if (!pixs)
+        return (PIX *)ERROR_PTR("pixs not defined", procName, NULL);
+    if (!ptas)
+        return (PIX *)ERROR_PTR("ptas not defined", procName, NULL);
+    if (!ptad)
+        return (PIX *)ERROR_PTR("ptad not defined", procName, NULL);
+    if (pixGetDepth(pixs) != 32)
+        return (PIX *)ERROR_PTR("pixs must be 32 bpp", procName, NULL);
+    if (ptaGetCount(ptas) != 4)
+        return (PIX *)ERROR_PTR("ptas count not 4", procName, NULL);
+    if (ptaGetCount(ptad) != 4)
+        return (PIX *)ERROR_PTR("ptad count not 4", procName, NULL);
+
+        /* Get backwards transform from dest to src, and apply it */
+    getProjectiveXformCoeffs(ptad, ptas, &vc);
+    pixd = pixProjectiveColor(pixs, vc, colorval);
+    FREE(vc);
+
+    return pixd;
+}
+
+
+/*!
+ *  pixProjectiveColor()
+ *
+ *      Input:  pixs (32 bpp)
+ *              vc  (vector of 8 coefficients for projective transformation)
+ *              colorval (e.g., 0 to bring in BLACK, 0xffffff00 for WHITE)
+ *      Return: pixd, or null on error
+ */
+PIX *
+pixProjectiveColor(PIX        *pixs,
+                   l_float32  *vc,
+                   l_uint32    colorval)
+{
+l_int32    i, j, w, h, d, wpls, wpld;
+l_uint32   val;
+l_uint32  *datas, *datad, *lined;
+l_float32  x, y;
+PIX       *pix1, *pix2, *pixd;
+
+    PROCNAME("pixProjectiveColor");
+
+    if (!pixs)
+        return (PIX *)ERROR_PTR("pixs not defined", procName, NULL);
+    pixGetDimensions(pixs, &w, &h, &d);
+    if (d != 32)
+        return (PIX *)ERROR_PTR("pixs must be 32 bpp", procName, NULL);
+    if (!vc)
+        return (PIX *)ERROR_PTR("vc not defined", procName, NULL);
+
+    datas = pixGetData(pixs);
+    wpls = pixGetWpl(pixs);
+    pixd = pixCreateTemplate(pixs);
+    pixSetAllArbitrary(pixd, colorval);
+    datad = pixGetData(pixd);
+    wpld = pixGetWpl(pixd);
+
+        /* Iterate over destination pixels */
+    for (i = 0; i < h; i++) {
+        lined = datad + i * wpld;
+        for (j = 0; j < w; j++) {
+                /* Compute float src pixel location corresponding to (i,j) */
+            projectiveXformPt(vc, j, i, &x, &y);
+            linearInterpolatePixelColor(datas, wpls, w, h, x, y, colorval,
+                                        &val);
+            *(lined + j) = val;
+        }
+    }
+
+        /* If rgba, transform the pixs alpha channel and insert in pixd */
+    if (pixGetSpp(pixs) == 4) {
+        pix1 = pixGetRGBComponent(pixs, L_ALPHA_CHANNEL);
+        pix2 = pixProjectiveGray(pix1, vc, 255);  /* bring in opaque */
+        pixSetRGBComponent(pixd, pix2, L_ALPHA_CHANNEL);
+        pixDestroy(&pix1);
+        pixDestroy(&pix2);
+    }
+
+    return pixd;
+}
+
+
+/*!
+ *  pixProjectivePtaGray()
+ *
+ *      Input:  pixs (8 bpp)
+ *              ptad  (4 pts of final coordinate space)
+ *              ptas  (4 pts of initial coordinate space)
+ *              grayval (0 to bring in BLACK, 255 for WHITE)
+ *      Return: pixd, or null on error
+ */
+PIX *
+pixProjectivePtaGray(PIX     *pixs,
+                     PTA     *ptad,
+                     PTA     *ptas,
+                     l_uint8  grayval)
+{
+l_float32  *vc;
+PIX        *pixd;
+
+    PROCNAME("pixProjectivePtaGray");
+
+    if (!pixs)
+        return (PIX *)ERROR_PTR("pixs not defined", procName, NULL);
+    if (!ptas)
+        return (PIX *)ERROR_PTR("ptas not defined", procName, NULL);
+    if (!ptad)
+        return (PIX *)ERROR_PTR("ptad not defined", procName, NULL);
+    if (pixGetDepth(pixs) != 8)
+        return (PIX *)ERROR_PTR("pixs must be 8 bpp", procName, NULL);
+    if (ptaGetCount(ptas) != 4)
+        return (PIX *)ERROR_PTR("ptas count not 4", procName, NULL);
+    if (ptaGetCount(ptad) != 4)
+        return (PIX *)ERROR_PTR("ptad count not 4", procName, NULL);
+
+        /* Get backwards transform from dest to src, and apply it */
+    getProjectiveXformCoeffs(ptad, ptas, &vc);
+    pixd = pixProjectiveGray(pixs, vc, grayval);
+    FREE(vc);
+
+    return pixd;
+}
+
+
+
+/*!
+ *  pixProjectiveGray()
+ *
+ *      Input:  pixs (8 bpp)
+ *              vc  (vector of 8 coefficients for projective transformation)
+ *              grayval (0 to bring in BLACK, 255 for WHITE)
+ *      Return: pixd, or null on error
+ */
+PIX *
+pixProjectiveGray(PIX        *pixs,
+                  l_float32  *vc,
+                  l_uint8     grayval)
+{
+l_int32    i, j, w, h, wpls, wpld, val;
+l_uint32  *datas, *datad, *lined;
+l_float32  x, y;
+PIX       *pixd;
+
+    PROCNAME("pixProjectiveGray");
+
+    if (!pixs)
+        return (PIX *)ERROR_PTR("pixs not defined", procName, NULL);
+    pixGetDimensions(pixs, &w, &h, NULL);
+    if (pixGetDepth(pixs) != 8)
+        return (PIX *)ERROR_PTR("pixs must be 8 bpp", procName, NULL);
+    if (!vc)
+        return (PIX *)ERROR_PTR("vc not defined", procName, NULL);
+
+    datas = pixGetData(pixs);
+    wpls = pixGetWpl(pixs);
+    pixd = pixCreateTemplate(pixs);
+    pixSetAllArbitrary(pixd, grayval);
+    datad = pixGetData(pixd);
+    wpld = pixGetWpl(pixd);
+
+        /* Iterate over destination pixels */
+    for (i = 0; i < h; i++) {
+        lined = datad + i * wpld;
+        for (j = 0; j < w; j++) {
+                /* Compute float src pixel location corresponding to (i,j) */
+            projectiveXformPt(vc, j, i, &x, &y);
+            linearInterpolatePixelGray(datas, wpls, w, h, x, y, grayval, &val);
+            SET_DATA_BYTE(lined, j, val);
+        }
+    }
+
+    return pixd;
+}
+
+
+/*---------------------------------------------------------------------------*
+ *            Projective transform including alpha (blend) component         *
+ *---------------------------------------------------------------------------*/
+/*!
+ *  pixProjectivePtaWithAlpha()
+ *
+ *      Input:  pixs (32 bpp rgb)
+ *              ptad  (4 pts of final coordinate space)
+ *              ptas  (4 pts of initial coordinate space)
+ *              pixg (<optional> 8 bpp, for alpha channel, can be null)
+ *              fract (between 0.0 and 1.0, with 0.0 fully transparent
+ *                     and 1.0 fully opaque)
+ *              border (of pixels added to capture transformed source pixels)
+ *      Return: pixd, or null on error
+ *
+ *  Notes:
+ *      (1) The alpha channel is transformed separately from pixs,
+ *          and aligns with it, being fully transparent outside the
+ *          boundary of the transformed pixs.  For pixels that are fully
+ *          transparent, a blending function like pixBlendWithGrayMask()
+ *          will give zero weight to corresponding pixels in pixs.
+ *      (2) If pixg is NULL, it is generated as an alpha layer that is
+ *          partially opaque, using @fract.  Otherwise, it is cropped
+ *          to pixs if required and @fract is ignored.  The alpha channel
+ *          in pixs is never used.
+ *      (3) Colormaps are removed.
+ *      (4) When pixs is transformed, it doesn't matter what color is brought
+ *          in because the alpha channel will be transparent (0) there.
+ *      (5) To avoid losing source pixels in the destination, it may be
+ *          necessary to add a border to the source pix before doing
+ *          the projective transformation.  This can be any non-negative
+ *          number.
+ *      (6) The input @ptad and @ptas are in a coordinate space before
+ *          the border is added.  Internally, we compensate for this
+ *          before doing the projective transform on the image after
+ *          the border is added.
+ *      (7) The default setting for the border values in the alpha channel
+ *          is 0 (transparent) for the outermost ring of pixels and
+ *          (0.5 * fract * 255) for the second ring.  When blended over
+ *          a second image, this
+ *          (a) shrinks the visible image to make a clean overlap edge
+ *              with an image below, and
+ *          (b) softens the edges by weakening the aliasing there.
+ *          Use l_setAlphaMaskBorder() to change these values.
+ */
+PIX *
+pixProjectivePtaWithAlpha(PIX       *pixs,
+                          PTA       *ptad,
+                          PTA       *ptas,
+                          PIX       *pixg,
+                          l_float32  fract,
+                          l_int32    border)
+{
+l_int32  ws, hs, d;
+PIX     *pixd, *pixb1, *pixb2, *pixg2, *pixga;
+PTA     *ptad2, *ptas2;
+
+    PROCNAME("pixProjectivePtaWithAlpha");
+
+    if (!pixs)
+        return (PIX *)ERROR_PTR("pixs not defined", procName, NULL);
+    pixGetDimensions(pixs, &ws, &hs, &d);
+    if (d != 32 && pixGetColormap(pixs) == NULL)
+        return (PIX *)ERROR_PTR("pixs not cmapped or 32 bpp", procName, NULL);
+    if (pixg && pixGetDepth(pixg) != 8) {
+        L_WARNING("pixg not 8 bpp; using @fract transparent alpha\n", procName);
+        pixg = NULL;
+    }
+    if (!pixg && (fract < 0.0 || fract > 1.0)) {
+        L_WARNING("invalid fract; using 1.0 (fully transparent)\n", procName);
+        fract = 1.0;
+    }
+    if (!pixg && fract == 0.0)
+        L_WARNING("fully opaque alpha; image will not be blended\n", procName);
+    if (!ptad)
+        return (PIX *)ERROR_PTR("ptad not defined", procName, NULL);
+    if (!ptas)
+        return (PIX *)ERROR_PTR("ptas not defined", procName, NULL);
+
+        /* Add border; the color doesn't matter */
+    pixb1 = pixAddBorder(pixs, border, 0);
+
+        /* Transform the ptr arrays to work on the bordered image */
+    ptad2 = ptaTransform(ptad, border, border, 1.0, 1.0);
+    ptas2 = ptaTransform(ptas, border, border, 1.0, 1.0);
+
+        /* Do separate projective transform of rgb channels of pixs
+         * and of pixg */
+    pixd = pixProjectivePtaColor(pixb1, ptad2, ptas2, 0);
+    if (!pixg) {
+        pixg2 = pixCreate(ws, hs, 8);
+        if (fract == 1.0)
+            pixSetAll(pixg2);
+        else
+            pixSetAllArbitrary(pixg2, (l_int32)(255.0 * fract));
+    } else {
+        pixg2 = pixResizeToMatch(pixg, NULL, ws, hs);
+    }
+    if (ws > 10 && hs > 10) {  /* see note 7 */
+        pixSetBorderRingVal(pixg2, 1,
+                            (l_int32)(255.0 * fract * AlphaMaskBorderVals[0]));
+        pixSetBorderRingVal(pixg2, 2,
+                            (l_int32)(255.0 * fract * AlphaMaskBorderVals[1]));
+
+    }
+    pixb2 = pixAddBorder(pixg2, border, 0);  /* must be black border */
+    pixga = pixProjectivePtaGray(pixb2, ptad2, ptas2, 0);
+    pixSetRGBComponent(pixd, pixga, L_ALPHA_CHANNEL);
+    pixSetSpp(pixd, 4);
+
+    pixDestroy(&pixg2);
+    pixDestroy(&pixb1);
+    pixDestroy(&pixb2);
+    pixDestroy(&pixga);
+    ptaDestroy(&ptad2);
+    ptaDestroy(&ptas2);
+    return pixd;
+}
+
+
+/*-------------------------------------------------------------*
+ *                Projective coordinate transformation         *
+ *-------------------------------------------------------------*/
+/*!
+ *  getProjectiveXformCoeffs()
+ *
+ *      Input:  ptas  (source 4 points; unprimed)
+ *              ptad  (transformed 4 points; primed)
+ *              &vc   (<return> vector of coefficients of transform)
+ *      Return: 0 if OK; 1 on error
+ *
+ *  We have a set of 8 equations, describing the projective
+ *  transformation that takes 4 points (ptas) into 4 other
+ *  points (ptad).  These equations are:
+ *
+ *          x1' = (c[0]*x1 + c[1]*y1 + c[2]) / (c[6]*x1 + c[7]*y1 + 1)
+ *          y1' = (c[3]*x1 + c[4]*y1 + c[5]) / (c[6]*x1 + c[7]*y1 + 1)
+ *          x2' = (c[0]*x2 + c[1]*y2 + c[2]) / (c[6]*x2 + c[7]*y2 + 1)
+ *          y2' = (c[3]*x2 + c[4]*y2 + c[5]) / (c[6]*x2 + c[7]*y2 + 1)
+ *          x3' = (c[0]*x3 + c[1]*y3 + c[2]) / (c[6]*x3 + c[7]*y3 + 1)
+ *          y3' = (c[3]*x3 + c[4]*y3 + c[5]) / (c[6]*x3 + c[7]*y3 + 1)
+ *          x4' = (c[0]*x4 + c[1]*y4 + c[2]) / (c[6]*x4 + c[7]*y4 + 1)
+ *          y4' = (c[3]*x4 + c[4]*y4 + c[5]) / (c[6]*x4 + c[7]*y4 + 1)
+ *
+ *  Multiplying both sides of each eqn by the denominator, we get
+ *
+ *           AC = B
+ *
+ *  where B and C are column vectors
+ *
+ *         B = [ x1' y1' x2' y2' x3' y3' x4' y4' ]
+ *         C = [ c[0] c[1] c[2] c[3] c[4] c[5] c[6] c[7] ]
+ *
+ *  and A is the 8x8 matrix
+ *
+ *             x1   y1     1     0   0    0   -x1*x1'  -y1*x1'
+ *              0    0     0    x1   y1   1   -x1*y1'  -y1*y1'
+ *             x2   y2     1     0   0    0   -x2*x2'  -y2*x2'
+ *              0    0     0    x2   y2   1   -x2*y2'  -y2*y2'
+ *             x3   y3     1     0   0    0   -x3*x3'  -y3*x3'
+ *              0    0     0    x3   y3   1   -x3*y3'  -y3*y3'
+ *             x4   y4     1     0   0    0   -x4*x4'  -y4*x4'
+ *              0    0     0    x4   y4   1   -x4*y4'  -y4*y4'
+ *
+ *  These eight equations are solved here for the coefficients C.
+ *
+ *  These eight coefficients can then be used to find the mapping
+ *  (x,y) --> (x',y'):
+ *
+ *           x' = (c[0]x + c[1]y + c[2]) / (c[6]x + c[7]y + 1)
+ *           y' = (c[3]x + c[4]y + c[5]) / (c[6]x + c[7]y + 1)
+ *
+ *  that is implemented in projectiveXformSampled() and
+ *  projectiveXFormInterpolated().
+ */
+l_int32
+getProjectiveXformCoeffs(PTA         *ptas,
+                         PTA         *ptad,
+                         l_float32  **pvc)
+{
+l_int32     i;
+l_float32   x1, y1, x2, y2, x3, y3, x4, y4;
+l_float32  *b;   /* rhs vector of primed coords X'; coeffs returned in *pvc */
+l_float32  *a[8];  /* 8x8 matrix A  */
+
+    PROCNAME("getProjectiveXformCoeffs");
+
+    if (!ptas)
+        return ERROR_INT("ptas not defined", procName, 1);
+    if (!ptad)
+        return ERROR_INT("ptad not defined", procName, 1);
+    if (!pvc)
+        return ERROR_INT("&vc not defined", procName, 1);
+
+    if ((b = (l_float32 *)CALLOC(8, sizeof(l_float32))) == NULL)
+        return ERROR_INT("b not made", procName, 1);
+    *pvc = b;
+
+    ptaGetPt(ptas, 0, &x1, &y1);
+    ptaGetPt(ptas, 1, &x2, &y2);
+    ptaGetPt(ptas, 2, &x3, &y3);
+    ptaGetPt(ptas, 3, &x4, &y4);
+    ptaGetPt(ptad, 0, &b[0], &b[1]);
+    ptaGetPt(ptad, 1, &b[2], &b[3]);
+    ptaGetPt(ptad, 2, &b[4], &b[5]);
+    ptaGetPt(ptad, 3, &b[6], &b[7]);
+
+    for (i = 0; i < 8; i++) {
+        if ((a[i] = (l_float32 *)CALLOC(8, sizeof(l_float32))) == NULL)
+            return ERROR_INT("a[i] not made", procName, 1);
+    }
+
+    a[0][0] = x1;
+    a[0][1] = y1;
+    a[0][2] = 1.;
+    a[0][6] = -x1 * b[0];
+    a[0][7] = -y1 * b[0];
+    a[1][3] = x1;
+    a[1][4] = y1;
+    a[1][5] = 1;
+    a[1][6] = -x1 * b[1];
+    a[1][7] = -y1 * b[1];
+    a[2][0] = x2;
+    a[2][1] = y2;
+    a[2][2] = 1.;
+    a[2][6] = -x2 * b[2];
+    a[2][7] = -y2 * b[2];
+    a[3][3] = x2;
+    a[3][4] = y2;
+    a[3][5] = 1;
+    a[3][6] = -x2 * b[3];
+    a[3][7] = -y2 * b[3];
+    a[4][0] = x3;
+    a[4][1] = y3;
+    a[4][2] = 1.;
+    a[4][6] = -x3 * b[4];
+    a[4][7] = -y3 * b[4];
+    a[5][3] = x3;
+    a[5][4] = y3;
+    a[5][5] = 1;
+    a[5][6] = -x3 * b[5];
+    a[5][7] = -y3 * b[5];
+    a[6][0] = x4;
+    a[6][1] = y4;
+    a[6][2] = 1.;
+    a[6][6] = -x4 * b[6];
+    a[6][7] = -y4 * b[6];
+    a[7][3] = x4;
+    a[7][4] = y4;
+    a[7][5] = 1;
+    a[7][6] = -x4 * b[7];
+    a[7][7] = -y4 * b[7];
+
+    gaussjordan(a, b, 8);
+
+    for (i = 0; i < 8; i++)
+        FREE(a[i]);
+
+    return 0;
+}
+
+
+/*!
+ *  projectiveXformSampledPt()
+ *
+ *      Input:  vc (vector of 8 coefficients)
+ *              (x, y)  (initial point)
+ *              (&xp, &yp)   (<return> transformed point)
+ *      Return: 0 if OK; 1 on error
+ *
+ *  Notes:
+ *      (1) This finds the nearest pixel coordinates of the transformed point.
+ *      (2) It does not check ptrs for returned data!
+ */
+l_int32
+projectiveXformSampledPt(l_float32  *vc,
+                         l_int32     x,
+                         l_int32     y,
+                         l_int32    *pxp,
+                         l_int32    *pyp)
+{
+l_float32  factor;
+
+    PROCNAME("projectiveXformSampledPt");
+
+    if (!vc)
+        return ERROR_INT("vc not defined", procName, 1);
+
+    factor = 1. / (vc[6] * x + vc[7] * y + 1.);
+    *pxp = (l_int32)(factor * (vc[0] * x + vc[1] * y + vc[2]) + 0.5);
+    *pyp = (l_int32)(factor * (vc[3] * x + vc[4] * y + vc[5]) + 0.5);
+    return 0;
+}
+
+
+/*!
+ *  projectiveXformPt()
+ *
+ *      Input:  vc (vector of 8 coefficients)
+ *              (x, y)  (initial point)
+ *              (&xp, &yp)   (<return> transformed point)
+ *      Return: 0 if OK; 1 on error
+ *
+ *  Notes:
+ *      (1) This computes the floating point location of the transformed point.
+ *      (2) It does not check ptrs for returned data!
+ */
+l_int32
+projectiveXformPt(l_float32  *vc,
+                  l_int32     x,
+                  l_int32     y,
+                  l_float32  *pxp,
+                  l_float32  *pyp)
+{
+l_float32  factor;
+
+    PROCNAME("projectiveXformPt");
+
+    if (!vc)
+        return ERROR_INT("vc not defined", procName, 1);
+
+    factor = 1. / (vc[6] * x + vc[7] * y + 1.);
+    *pxp = factor * (vc[0] * x + vc[1] * y + vc[2]);
+    *pyp = factor * (vc[3] * x + vc[4] * y + vc[5]);
+    return 0;
+}

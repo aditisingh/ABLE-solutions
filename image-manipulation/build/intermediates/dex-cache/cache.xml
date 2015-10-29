@@ -2,18 +2,18 @@
 <items version="2" >
 
     <item
-        jar="/home/aditi/ABLE-solutions/image-manipulation/openCVSampleimagemanipulations/build/intermediates/exploded-aar/image-manipulation/openCVLibrary300/unspecified/jars/classes.jar"
+        jar="/home/kunal/ABLE-solutions/image-manipulation/openCVSampleimagemanipulations/build/intermediates/exploded-aar/image-manipulation/openCVLibrary300/unspecified/jars/classes.jar"
         jumboMode="false"
         revision="23.0.1"
-        sha1="ad784cebf95145ccaaa4674993861c552288408d">
-        <dex dex="/home/aditi/ABLE-solutions/image-manipulation/openCVSampleimagemanipulations/build/intermediates/pre-dexed/debug/classes-e78eda0738539a5f2b13b0c1e561a9d5e3c629ab.jar" />
+        sha1="a83f4690dd40b32f90173b14cafa80125cba09ad">
+        <dex dex="/home/kunal/ABLE-solutions/image-manipulation/openCVSampleimagemanipulations/build/intermediates/pre-dexed/debug/classes-a8aaeeb18866db6518dc125d6f883905f3f38bbf.jar" />
     </item>
     <item
-        jar="/home/aditi/ABLE-solutions/image-manipulation/openCVSampleimagemanipulations/build/intermediates/exploded-aar/image-manipulation/tesstwo/unspecified/jars/classes.jar"
+        jar="/home/kunal/ABLE-solutions/image-manipulation/openCVSampleimagemanipulations/build/intermediates/exploded-aar/image-manipulation/tesstwo/unspecified/jars/classes.jar"
         jumboMode="false"
         revision="23.0.1"
-        sha1="4a6ac456f523bb1ea699b142ecda21b518318ec6">
-        <dex dex="/home/aditi/ABLE-solutions/image-manipulation/openCVSampleimagemanipulations/build/intermediates/pre-dexed/debug/classes-17ab4bc79bdab483c77e6321eb71904d8b08fadf.jar" />
+        sha1="1546eda55962cdb2d5abb4d5f2fd4d36b0605e0c">
+        <dex dex="/home/kunal/ABLE-solutions/image-manipulation/openCVSampleimagemanipulations/build/intermediates/pre-dexed/debug/classes-97eb9c749edf674b5755bbf46a4f5c3b09018e68.jar" />
     </item>
 
 </items>
