@@ -19,6 +19,7 @@ import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
 import org.opencv.core.Rect;
 import org.opencv.core.Core;
+import org.opencv.core.Core.*;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfFloat;
@@ -550,24 +551,49 @@ public class ImageManipulationsActivity extends Activity implements CvCameraView
         ///////////////////////////////////////////////////////////////////////////////////////////////
         ///////////////////////////////////////////////////////////////////////////////////////////////
 
+
         //////////////////////////////////////////////////////////////////////////////////////////////
         ////////// Method to rotate based on Hough transform
         //////////////////////////////////////////////////////////////////////////////////////////////
         Mat bw_ = new Mat();
         Core.bitwise_not(detected_edges, bw_);
         Mat lines = new Mat();
+        int dilation_size = 5;
+
+        Mat element = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new  Size(2*dilation_size + 1, 2*dilation_size+1));
+        Imgproc.dilate(bw_,bw_, element);
+
+
         Imgproc.HoughLinesP(bw_, lines, 1, Math.PI/180, 100, cols / 2.f, 20);
         Mat disp_lines = new Mat(bw_.size(), CvType.CV_8UC1, new Scalar(0, 0, 0));
         double angle = 0.;
         double nb_lines = lines.size().height;
+
         for (double i = 0; i < nb_lines; ++i)
         {
-            angle += Math.atan2(lines.get((int)i,0)[3] - lines.get((int)i, 0)[1], lines.get((int)i, 0)[2] - lines.get((int)i, 0)[0]);
+            double x1 = lines.get((int)i, 0)[0],
+                    y1 = lines.get((int)i, 0)[1],
+                    x2 = lines.get((int)i, 0)[2],
+                    y2 = lines.get((int)i, 0)[3];
+            Point start = new Point(x1, y1);
+            Point end = new Point(x2, y2);
+
+            Imgproc.line(rgba, start, end, new Scalar(255, 0, 0), 3);
+            angle += Math.atan2(x2-x1,y2-y1);
         }
         angle /= nb_lines; // mean angle, in radians.
         Log.d(TAG, "Angle"+angle);//correct
+        double angle1=Math.toDegrees(angle);
+        if(angle1>90)
+            angle1-=180;
 
         // TODO Rotated doc -> Extract doc -> Save it
+        Point center=new Point(bw_.cols()/2,bw_.rows()/2);
+        Mat rot_matrix = Imgproc.getRotationMatrix2D(center, -angle1, 1);
+        Mat rotated = new Mat(bw_.cols(), bw_.rows(), CvType.CV_8UC3, new Scalar(255));
+//                roi_.copyTo(rotated);
+        Imgproc.warpAffine(rgba, rotated, rot_matrix, rgba.size(), Imgproc.INTER_CUBIC);
+                Log.d(TAG, "Warping");
 //        String filename = "test.bmp";
 //        File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), filename);
 //        _path = file.toString();
@@ -581,7 +607,7 @@ public class ImageManipulationsActivity extends Activity implements CvCameraView
 //
 //        return detected_edges;//rgba;//image;//dst;//rgba;//dst;//grad;//dst;//new_img;
         mOpenCvCameraView.setFlashMode(this, 4);
-        return rgba;
+        return rotated;
     }
 
     protected void onPhotoTaken() {
