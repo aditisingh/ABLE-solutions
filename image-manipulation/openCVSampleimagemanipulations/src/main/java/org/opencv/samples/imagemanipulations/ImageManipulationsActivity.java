@@ -17,6 +17,7 @@ import org.opencv.android.CameraBridgeViewBase.CvCameraViewFrame;
 import org.opencv.android.JavaCameraView;
 import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
+import org.opencv.core.MatOfDouble;
 import org.opencv.core.Rect;
 import org.opencv.core.Core;
 import org.opencv.core.Core.*;
@@ -24,6 +25,7 @@ import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfFloat;
 import org.opencv.core.MatOfPoint;
+import org.opencv.core.MatOfKeyPoint;
 import org.opencv.core.MatOfPoint2f;
 import org.opencv.core.MatOfInt;
 import org.opencv.core.Point;
@@ -34,6 +36,8 @@ import org.opencv.android.CameraBridgeViewBase;
 import org.opencv.android.CameraBridgeViewBase.CvCameraViewListener2;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
+import org.opencv.features2d.FeatureDetector;
+import org.opencv.features2d.Features2d;
 import org.opencv.calib3d.Calib3d;
 
 import android.app.Activity;
@@ -81,6 +85,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import java.io.OutputStreamWriter;
 
 import com.googlecode.tesseract.android.TessBaseAPI;
 
@@ -466,18 +471,25 @@ public class ImageManipulationsActivity extends Activity implements CvCameraView
 //        mOpenCvCameraView.setFlashMode(this, 1);
 
         Size sizeRgba = rgba.size();
-        Mat input = new Mat();
-        rgba.copyTo(input);
-
         int rows = (int) sizeRgba.height;//=720
         int cols = (int) sizeRgba.width;//=1280
 
         Mat gray = new Mat();
-//        Size blur_size = new Size(3, 3);
-
-//        Mat imageMat = new Mat();
         Imgproc.cvtColor(rgba, gray, Imgproc.COLOR_BGR2GRAY);
-        //needed median filter?
+
+        // Laplacian
+        Mat lap_output = new Mat();
+        Imgproc.Laplacian(gray, lap_output, CvType.CV_8U);
+        MatOfDouble mu = new MatOfDouble();
+        MatOfDouble sigma = new MatOfDouble();
+        Core.meanStdDev(lap_output, mu, sigma);
+
+        double focusMeasure = sigma.get(0,0)[0];
+        Log.d(TAG, "Focus measure"+focusMeasure);
+
+        if (focusMeasure < 8) {
+//            return rgba;
+        }
 
         gray.convertTo(gray, CvType.CV_32FC1);
         Mat gray_dst = new Mat();
@@ -561,71 +573,100 @@ public class ImageManipulationsActivity extends Activity implements CvCameraView
 ////            Imgproc.line(rgba, rect_points[i], rect_points[(i + 1) % 4],color, 4);// Core.LINE_AA);
 //        }
 
-//        ///////////////////////////////////////////////////////////
-//        ///////// Aditi's old code, not using currently
-//        ///////////////////////////////////////////////////////////
-        ///////////// REFER GIT
-//        ///////////////////////////////////////////////////////////////////////////////////////////////
+        //////////////////////////////////////////////////////////////////////////////////////////////
+        ////////// Method to rotate based on Hough transform
+        //////////////////////////////////////////////////////////////////////////////////////////////
 
+//        Mat bw_ = new Mat();
+//        Core.bitwise_not(detected_edges, bw_);
+//
+//        RotatedRect rect_im;
+//        Mat points=Mat.zeros(bw_.size(),bw_.type());
+//        Core.findNonZero(bw_,points);
+//
+//        MatOfPoint mpoints = new MatOfPoint(points);
+//        MatOfPoint2f points2f = new MatOfPoint2f(mpoints.toArray());
+//        Point[] rect_points = new Point[4];
+//
+//        rect_im = Imgproc.minAreaRect(points2f);
+//        rect_im.points(rect_points);
+//
+////        Scalar color = new Scalar( 255, 0, 0 );
+////        for(int i=0;i<4;i++)
+////            Imgproc.line(rgba, rect_points[i], rect_points[(i + 1) % 4],color, 4);// Core.LINE_AA);
+//
+//        Mat lines = new Mat();
+//        Mat bw_1=new Mat();
+//        int erosion_size = 3;
+//
+//        Mat element1 = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new  Size(2*erosion_size + 1, 2*erosion_size-1));
+//        Imgproc.dilate(bw_,bw_1, element1);
+//
+//        Imgproc.HoughLinesP(bw_1, lines, 1, Math.PI/180, 100, cols / 5, cols / 10);
+//        Mat disp_lines = new Mat(bw_1.size(), CvType.CV_8UC1, new Scalar(0, 0, 0));
+//        double angle = 0.;
+//        double nb_lines = lines.size().height;
+//
+//        double angle1=Math.toDegrees(angle);
+//
+//////    TODO Rotated doc -> Extract doc -> Save it
+//
+//        Mat rot_matrix = Imgproc.getRotationMatrix2D(rect_im.center, angle1, 1);
+//        Mat rotated = new Mat(bw_.cols(), bw_.rows(), CvType.CV_8UC3, new Scalar(255));
+//
+////        Draws the bounding box
+////        Rect r = rect_im.boundingRect();
+////        Imgproc.rectangle(rgba, r.tl(), r.br(), new Scalar(255, 255, 0));
+//
+//        Imgproc.warpAffine(rgba, rgba, rot_matrix, rgba.size(), Imgproc.INTER_CUBIC);
+//        Imgproc.warpAffine(gray_dst, gray_dst, rot_matrix, rgba.size(), Imgproc.INTER_CUBIC);
+//
+//        for (double i = 0; i < nb_lines; ++i)
+//        {
+//            double x1 = lines.get((int)i, 0)[0],
+//                    y1 = lines.get((int)i, 0)[1],
+//                    x2 = lines.get((int)i, 0)[2],
+//                    y2 = lines.get((int)i, 0)[3];
+//            Point start = new Point(x1, y1);
+//            Point end = new Point(x2, y2);
+//
+////            Imgproc.line(rgba, start, end, new Scalar(0,255, 0), 3);
+//            angle += Math.atan2(y2-y1,x2-x1);
+//        }
+//        angle /= nb_lines; // mean angle, in radians.
+//        Log.d(TAG, "Angle" + angle);//correct
+//        Log.d(TAG, "Area" + bw_.size().area());
 
-//        //////////////////////////////////////////////////////////////////////////////////////////////
-//        ////////// Method to rotate based on Hough transform
-//        //////////////////////////////////////////////////////////////////////////////////////////////
-        Mat bw_ = new Mat();
-        Core.bitwise_not(detected_edges, bw_);
+        // Do a MSER here
+        MatOfKeyPoint mokp = new MatOfKeyPoint();
+        FeatureDetector fd = FeatureDetector.create(FeatureDetector.MSER);
 
-        RotatedRect rect_im=null;
-        Mat points=Mat.zeros(bw_.size(),bw_.type());
-        Core.findNonZero(bw_,points);
-
-        MatOfPoint mpoints = new MatOfPoint(points);
-        MatOfPoint2f points2f = new MatOfPoint2f(mpoints.toArray());
-        Point[] rect_points = new Point[4];
-
-        rect_im = Imgproc.minAreaRect(points2f);
-        Rect r = rect_im.boundingRect();
-        rect_im.points(rect_points);
-
-//        Scalar color = new Scalar( 255, 0, 0 );
-//        for(int i=0;i<4;i++)
-//            Imgproc.line(rgba, rect_points[i], rect_points[(i + 1) % 4],color, 4);// Core.LINE_AA);
-
-        Mat lines = new Mat();
-        Mat bw_1=new Mat();
-        int erosion_size = 3;
-
-        Mat element1 = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new  Size(2*erosion_size + 1, 2*erosion_size-1));
-        Imgproc.dilate(bw_,bw_1, element1);
-
-        Imgproc.HoughLinesP(bw_1, lines, 1, Math.PI/180, 100, cols / 5, cols / 10);
-        Mat disp_lines = new Mat(bw_1.size(), CvType.CV_8UC1, new Scalar(0, 0, 0));
-        double angle = 0.;
-        double nb_lines = lines.size().height;
-        for (double i = 0; i < nb_lines; ++i)
-        {
-            double x1 = lines.get((int)i, 0)[0],
-                    y1 = lines.get((int)i, 0)[1],
-                    x2 = lines.get((int)i, 0)[2],
-                    y2 = lines.get((int)i, 0)[3];
-            Point start = new Point(x1, y1);
-            Point end = new Point(x2, y2);
-
-//            Imgproc.line(rgba, start, end, new Scalar(0,255, 0), 3);
-            angle += Math.atan2(y2-y1,x2-x1);
+//        //// Vary properties of MSER here
+        File outputDir = getCacheDir();
+        try {
+            File outputFile = File.createTempFile("MSERDetectorParams", ".YAML", outputDir);
+            writeToFile(outputFile, "%YAML:1.0\ndelta: 1000\nminArea: 1\nmaxArea: 921600\nmaxVariation: 0.25\nminDiversity: 0.5\n");
+            fd.read(outputFile.getPath());
         }
-        angle /= nb_lines; // mean angle, in radians.
+        catch(IOException e) {
+            Log.d(TAG, "No params file");
+        }
 
-        double angle1=Math.toDegrees(angle);
+//        Imgproc.Canny(gray_dst, gray_dst, 400, 450);
+        fd.detect(gray_dst, mokp);
 
-////        // TODO Rotated doc -> Extract doc -> Save it
+        Log.i(TAG, "Mat of key points = " + mokp.rows() + "x" + mokp.cols());
 
-        Mat rot_matrix = Imgproc.getRotationMatrix2D(rect_im.center, angle1, 1);
-        Mat rotated = new Mat(bw_.cols(), bw_.rows(), CvType.CV_8UC3, new Scalar(255));
-
-//        Draws the bounding box
-//        Imgproc.rectangle(rgba, r.tl(), r.br(), new Scalar(255, 255, 0));
-
-        Imgproc.warpAffine(rgba, rotated, rot_matrix, rgba.size(), Imgproc.INTER_CUBIC);
+        Mat OutImage = new Mat();
+        Imgproc.cvtColor(rgba, OutImage, Imgproc.COLOR_RGBA2RGB);
+//
+        if (!mokp.empty()) {
+            // Draw kewpoints
+            Scalar color = new Scalar(0, 0, 255); // BGR
+            int flags = Features2d.DRAW_RICH_KEYPOINTS; // For each keypoint, the circle around keypoint with keypoint size and orientation will be drawn.
+            Features2d.drawKeypoints(OutImage, mokp, OutImage, color , flags);
+            Imgproc.cvtColor(OutImage, rgba, Imgproc.COLOR_RGB2RGBA);
+        }
 
 //                Log.d(TAG, "Warping");
 //        String filename = "test.bmp";
@@ -640,8 +681,21 @@ public class ImageManipulationsActivity extends Activity implements CvCameraView
 //        onPhotoTaken();
 
 //        return detected_edges;//rgba;//image;//dst;//rgba;//dst;//grad;//dst;//new_img;
-//       mOpenCvCameraView.setFlashMode(this, 4);
-        return  rotated;//tmpImg;//img_smeared;//binary_img;//rotated;//gba;//bw_1;//rgba;//otated;//gba;//otated;//erode_dst;//detected_edges;//bw;//detected_edges;///bw_;//rotated;//gba;//bw_;//rotated;
+        return  rgba;//tmpImg;//img_smeared;//binary_img;//rotated;//gba;//bw_1;//rgba;//otated;//gba;//otated;//erode_dst;//detected_edges;//bw;//detected_edges;///bw_;//rotated;//gba;//bw_;//rotated;
+//        mOpenCvCameraView.setFlashMode(this, 4);
+//        return ret;
+    }
+
+    private void writeToFile(File file, String data) {
+        try {
+            FileOutputStream stream = new FileOutputStream(file);
+            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(stream);
+            outputStreamWriter.write(data);
+            outputStreamWriter.close();
+            stream.close();
+        } catch (IOException e) {
+            Log.d(TAG, "Not able to write to file");
+        }
     }
 
     protected void onPhotoTaken() {
