@@ -488,7 +488,7 @@ public class ImageManipulationsActivity extends Activity implements CvCameraView
         Log.d(TAG, "Focus measure"+focusMeasure);
 
         if (focusMeasure < 8) {
-//            return rgba;
+            return rgba;
         }
 
         gray.convertTo(gray, CvType.CV_32FC1);
@@ -499,178 +499,194 @@ public class ImageManipulationsActivity extends Activity implements CvCameraView
         Imgproc.adaptiveThreshold(gray_dst, detected_edges, 255, Imgproc.ADAPTIVE_THRESH_MEAN_C, Imgproc.THRESH_BINARY, 25, 2);
 
         Mat binary_img = detected_edges.clone();
+
+        //////////////////////////////////////////////////////////////////////////////////////////////
+        ////////// Method to rotate based on Hough transform: DESKEWING THE IMAGE/////////////////////
+        //////////////////////////////////////////////////////////////////////////////////////////////
+
+        Mat bw_ = new Mat();
+        Core.bitwise_not(detected_edges, bw_);
+
+        RotatedRect rect_im;
+        Mat points=Mat.zeros(bw_.size(),bw_.type());
+        Core.findNonZero(bw_,points);
+
+        MatOfPoint mpoints = new MatOfPoint(points);
+        MatOfPoint2f points2f = new MatOfPoint2f(mpoints.toArray());
+        Point[] rect_points = new Point[4];
+
+        rect_im = Imgproc.minAreaRect(points2f);
+        rect_im.points(rect_points);
+
+//        Scalar color = new Scalar( 255, 0, 0 );
+//        for(int i=0;i<4;i++)
+//            Imgproc.line(rgba, rect_points[i], rect_points[(i + 1) % 4],color, 4);// Core.LINE_AA);
+
+        Mat lines = new Mat();
+        Mat bw_1=new Mat();
+        int erosion_size = 3;
+
+        Mat element1 = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new  Size(2*erosion_size + 1, 2*erosion_size-1));
+        Imgproc.dilate(bw_,bw_1, element1);
+
+        Imgproc.HoughLinesP(bw_1, lines, 1, Math.PI/180, 100, cols / 5, cols / 10);
+        Mat disp_lines = new Mat(bw_1.size(), CvType.CV_8UC1, new Scalar(0, 0, 0));
+        double angle = 0.;
+        double nb_lines = lines.size().height;
+
+////    TODO Rotated doc -> Extract doc -> Save it
+//        Mat rotated = new Mat(bw_.cols(), bw_.rows(), CvType.CV_8UC3, new Scalar(255));
+
+//        Draws the bounding box
+        Rect r = rect_im.boundingRect();
+        Imgproc.rectangle(rgba, r.tl(), r.br(), new Scalar(255, 255, 0));
+
+        for (double i = 0; i < nb_lines; ++i)
+        {
+            double x1 = lines.get((int)i, 0)[0],
+                    y1 = lines.get((int)i, 0)[1],
+                    x2 = lines.get((int)i, 0)[2],
+                    y2 = lines.get((int)i, 0)[3];
+            Point start = new Point(x1, y1);
+            Point end = new Point(x2, y2);
+
+           // Imgproc.line(rgba, start, end, new Scalar(0,255, 0), 3);
+            angle += Math.atan2(y2-y1,x2-x1);
+        }
+        angle /= nb_lines; // mean angle, in radians.
+        Log.d(TAG, "Angle" + angle);//correct
+        Log.d(TAG, "Area" + bw_.size().area());
+
+        double angle1=Math.toDegrees(angle);
+        Mat rot_matrix = Imgproc.getRotationMatrix2D(rect_im.center, angle1, 1);
+
+        Imgproc.warpAffine(rgba, rgba, rot_matrix, rgba.size(), Imgproc.INTER_CUBIC);
+        Imgproc.warpAffine(binary_img, binary_img, rot_matrix, binary_img.size(), Imgproc.INTER_CUBIC);
+
         Mat binary_img2=binary_img.clone();
 
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////detecting text regions in the image/////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
         // Smearing implementation
-//        int T = 20;
-//        int count = 0;
-//        int flag = 0;
-//        Mat tmpImg = new Mat(binary_img.size(), CvType.CV_8UC1, new Scalar(0, 0, 0));
-//        //doing row-wise
-//        for (int i = 0; i < rows; i++) {
-//            for (int j = 0; j < cols; j++) {
-//                double[] data_curr = binary_img.get(i, j);
-//                if (data_curr[0] == 255) {
-//                    flag = 255;
-//                    count = count + 1;
-//                } else {
-//                    if (flag == 255 && count <= T) {
-//                        for (int k = 0; k <= count; k++) {
-//                            binary_img.put(i - k, j, 0);
-//                            binary_img.put(i - k, j + 1, 0);
-//                        }
-//                    }
-//                    flag = 0;
-//                    count = 0;
-//                }
-//            }
-//        }
-//
-//
-//        for (int j = 0; j < cols; j++) {
-//            for (int i = 0; i < rows; i++) {
-//                double[] data_curr = binary_img2.get(i, j);
-//                if (data_curr[0] == 255) {
-//                    flag = 255;
-//                    count = count + 1;
-//                } else {
-//                    if (flag == 255 && count <= T) {
-//                        for (int k = 0; k <= count; k++) {
-//                            binary_img2.put(i - k, j, 0);
+        int T1 = cols/20;
+        int T2 = cols/10;
+        int count = 0;
+        int flag = 0;
+        Mat tmpImg = new Mat(binary_img.size(), CvType.CV_8UC1, new Scalar(0, 0, 0));
+        //doing row-wise
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                double[] data_curr = binary_img.get(i, j);
+                if (data_curr[0] == 255) {
+                    flag = 255;
+                    count = count + 1;
+                } else {
+                    if (flag == 255 && count <= T1) {
+                        for (int k = 0; k <= count; k++) {
+                            binary_img.put(i, j-k, 0);
+//                            binary_img.put(i, j + 1, 0);
+                        }
+                    }
+                    flag = 0;
+                    count = 0;
+                }
+            }
+        }
+
+
+        for (int j = 0; j < cols; j++) {
+            for (int i = 0; i < rows; i++) {
+                double[] data_curr = binary_img2.get(i, j);
+                if (data_curr[0] == 255) {
+                    flag = 255;
+                    count = count + 1;
+                } else {
+                    if (flag == 255 && count <= T2) {
+                        for (int k = 0; k <= count; k++) {
+                            binary_img2.put(i - k, j, 0);
 //                            binary_img2.put(i - k, j + 1, 0);
-//                        }
-//                    }
-//                    flag = 0;
-//                    count = 0;
-//                }
-//            }
-//        }
+                        }
+                    }
+                    flag = 0;
+                    count = 0;
+                }
+            }
+        }
 //
 //
-//        Core.bitwise_or(binary_img,binary_img2,tmpImg);
-//        int MAX_KERNEL_LENGTH=7;
-//        for(int k=1;k<MAX_KERNEL_LENGTH;k=k+2)
-//        {
-//            Imgproc.medianBlur(tmpImg,tmpImg,k);
-//        }
-//        List<MatOfPoint> contours = new ArrayList<MatOfPoint>();
-//
-//        Imgproc.findContours(tmpImg, contours, new Mat(), Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_SIMPLE);
-//        for(int i=0; i< contours.size();i++) {
-//            Rect rect = Imgproc.boundingRect(contours.get(i));
-//            RotatedRect rect_r;
-//
-//            Point[] rect_points = new Point[4];
-//            MatOfPoint2f mof = new MatOfPoint2f();
-//            MatOfPoint2f mo2f = new MatOfPoint2f(contours.get(i).toArray());
-//
-//
-//            rect_r = Imgproc.minAreaRect(mo2f);
-//            rect_r.points(rect_points);
-//            mof.fromArray(rect_points);
-//            Scalar color = new Scalar(0, 255, 0);
-////        for(int p=0;p<4;p++)
-////            Imgproc.line(rgba, rect_points[i], rect_points[(i + 1) % 4],color, 4);// Core.LINE_AA);
-//        }
+        Core.bitwise_or(binary_img,binary_img2,tmpImg);
+        int MAX_KERNEL_LENGTH=7;
+        for(int k=1;k<MAX_KERNEL_LENGTH;k=k+2)
+        {
+            Imgproc.medianBlur(tmpImg,tmpImg,k);
+        }
+        List<MatOfPoint> contours = new ArrayList<MatOfPoint>();
 
-        //////////////////////////////////////////////////////////////////////////////////////////////
-        ////////// Method to rotate based on Hough transform
-        //////////////////////////////////////////////////////////////////////////////////////////////
+        Imgproc.findContours(tmpImg, contours, new Mat(), Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_SIMPLE);
+//        Imgproc.drawContours(rgba, contours, -1, new Scalar(0,0,255));
+ for(int i=0; i< contours.size();i++) {
+     Rect rect = Imgproc.boundingRect(contours.get(i));
+     Imgproc.rectangle(rgba, rect.tl(), rect.br(), new Scalar(255, 0, 0));
 
-//        Mat bw_ = new Mat();
-//        Core.bitwise_not(detected_edges, bw_);
-//
-//        RotatedRect rect_im;
-//        Mat points=Mat.zeros(bw_.size(),bw_.type());
-//        Core.findNonZero(bw_,points);
-//
-//        MatOfPoint mpoints = new MatOfPoint(points);
-//        MatOfPoint2f points2f = new MatOfPoint2f(mpoints.toArray());
-//        Point[] rect_points = new Point[4];
-//
-//        rect_im = Imgproc.minAreaRect(points2f);
-//        rect_im.points(rect_points);
-//
-////        Scalar color = new Scalar( 255, 0, 0 );
-////        for(int i=0;i<4;i++)
-////            Imgproc.line(rgba, rect_points[i], rect_points[(i + 1) % 4],color, 4);// Core.LINE_AA);
-//
-//        Mat lines = new Mat();
-//        Mat bw_1=new Mat();
-//        int erosion_size = 3;
-//
-//        Mat element1 = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new  Size(2*erosion_size + 1, 2*erosion_size-1));
-//        Imgproc.dilate(bw_,bw_1, element1);
-//
-//        Imgproc.HoughLinesP(bw_1, lines, 1, Math.PI/180, 100, cols / 5, cols / 10);
-//        Mat disp_lines = new Mat(bw_1.size(), CvType.CV_8UC1, new Scalar(0, 0, 0));
-//        double angle = 0.;
-//        double nb_lines = lines.size().height;
-//
-//        double angle1=Math.toDegrees(angle);
-//
-//////    TODO Rotated doc -> Extract doc -> Save it
-//
-//        Mat rot_matrix = Imgproc.getRotationMatrix2D(rect_im.center, angle1, 1);
-//        Mat rotated = new Mat(bw_.cols(), bw_.rows(), CvType.CV_8UC3, new Scalar(255));
-//
-////        Draws the bounding box
-////        Rect r = rect_im.boundingRect();
-////        Imgproc.rectangle(rgba, r.tl(), r.br(), new Scalar(255, 255, 0));
-//
-//        Imgproc.warpAffine(rgba, rgba, rot_matrix, rgba.size(), Imgproc.INTER_CUBIC);
+            RotatedRect rect_r;
+
+            Point[] rect1_points = new Point[4];
+            MatOfPoint2f mof = new MatOfPoint2f();
+            MatOfPoint2f mo2f = new MatOfPoint2f(contours.get(i).toArray());
+
+
+            rect_r = Imgproc.minAreaRect(mo2f);
+            rect_r.points(rect1_points);
+            mof.fromArray(rect1_points);
+            Scalar color = new Scalar(0, 255, 0);
+            Rect rr = rect_r.boundingRect();
+            Imgproc.rectangle(rgba, rr.tl(), rr.tl(), new Scalar(0,0,255));
+     for(int p=0;p<4;p++)
+                   Imgproc.line(rgba, rect1_points[p], rect1_points[(p + 1) % 4],color, 4);
+ }
+
+
+
+
+
 //        Imgproc.warpAffine(gray_dst, gray_dst, rot_matrix, rgba.size(), Imgproc.INTER_CUBIC);
+
+//        // Do a MSER here
+//        MatOfKeyPoint mokp = new MatOfKeyPoint();
+//        FeatureDetector fd = FeatureDetector.create(FeatureDetector.MSER);
 //
-//        for (double i = 0; i < nb_lines; ++i)
-//        {
-//            double x1 = lines.get((int)i, 0)[0],
-//                    y1 = lines.get((int)i, 0)[1],
-//                    x2 = lines.get((int)i, 0)[2],
-//                    y2 = lines.get((int)i, 0)[3];
-//            Point start = new Point(x1, y1);
-//            Point end = new Point(x2, y2);
-//
-////            Imgproc.line(rgba, start, end, new Scalar(0,255, 0), 3);
-//            angle += Math.atan2(y2-y1,x2-x1);
+////        //// Vary properties of MSER here
+//        File outputDir = getCacheDir();
+//        try {
+//            File outputFile = File.createTempFile("MSERDetectorParams", ".YAML", outputDir);
+//            writeToFile(outputFile, "%YAML:1.0\ndelta: 1000\nminArea: 1\nmaxArea: 921600\nmaxVariation: 0.25\nminDiversity: 0.5\n");
+//            fd.read(outputFile.getPath());
 //        }
-//        angle /= nb_lines; // mean angle, in radians.
-//        Log.d(TAG, "Angle" + angle);//correct
-//        Log.d(TAG, "Area" + bw_.size().area());
-
-        // Do a MSER here
-        MatOfKeyPoint mokp = new MatOfKeyPoint();
-        FeatureDetector fd = FeatureDetector.create(FeatureDetector.MSER);
-
-//        //// Vary properties of MSER here
-        File outputDir = getCacheDir();
-        try {
-            File outputFile = File.createTempFile("MSERDetectorParams", ".YAML", outputDir);
-            writeToFile(outputFile, "%YAML:1.0\ndelta: 1000\nminArea: 1\nmaxArea: 921600\nmaxVariation: 0.25\nminDiversity: 0.5\n");
-            fd.read(outputFile.getPath());
-        }
-        catch(IOException e) {
-            Log.d(TAG, "No params file");
-        }
-
-//        Imgproc.Canny(gray_dst, gray_dst, 400, 450);
-        fd.detect(gray_dst, mokp);
-
-        Log.i(TAG, "Mat of key points = " + mokp.rows() + "x" + mokp.cols());
-
-        Mat OutImage = new Mat();
-        Imgproc.cvtColor(rgba, OutImage, Imgproc.COLOR_RGBA2RGB);
+//        catch(IOException e) {
+//            Log.d(TAG, "No params file");
+//        }
 //
-        if (!mokp.empty()) {
-            // Draw kewpoints
-            Scalar color = new Scalar(0, 0, 255); // BGR
-            int flags = Features2d.DRAW_RICH_KEYPOINTS; // For each keypoint, the circle around keypoint with keypoint size and orientation will be drawn.
-            Features2d.drawKeypoints(OutImage, mokp, OutImage, color , flags);
-            Imgproc.cvtColor(OutImage, rgba, Imgproc.COLOR_RGB2RGBA);
-        }
-
-//                Log.d(TAG, "Warping");
-//        String filename = "test.bmp";
-//        File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), filename);
+////        Imgproc.Canny(gray_dst, gray_dst, 400, 450);
+//        fd.detect(gray_dst, mokp);
+//
+//        Log.i(TAG, "Mat of key points = " + mokp.rows() + "x" + mokp.cols());
+//
+//        Mat OutImage = new Mat();
+//        Imgproc.cvtColor(rgba, OutImage, Imgproc.COLOR_RGBA2RGB);
+////
+//        if (!mokp.empty()) {
+//            // Draw kewpoints
+//            Scalar color = new Scalar(0, 0, 255); // BGR
+//            int flags = Features2d.DRAW_RICH_KEYPOINTS; // For each keypoint, the circle around keypoint with keypoint size and orientation will be drawn.
+//            Features2d.drawKeypoints(OutImage, mokp, OutImage, color , flags);
+//            Imgproc.cvtColor(OutImage, rgba, Imgproc.COLOR_RGB2RGBA);
+//        }
+//
+////                Log.d(TAG, "Warping");
+////        String filename = "test.bmp";
+////        File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), filename);
 //        _path = file.toString();
 ////
 //        boolean out = Imgcodecs.imwrite(_path,rotated);//rgba);//rgba);
@@ -681,7 +697,7 @@ public class ImageManipulationsActivity extends Activity implements CvCameraView
 //        onPhotoTaken();
 
 //        return detected_edges;//rgba;//image;//dst;//rgba;//dst;//grad;//dst;//new_img;
-        return  rgba;//tmpImg;//img_smeared;//binary_img;//rotated;//gba;//bw_1;//rgba;//otated;//gba;//otated;//erode_dst;//detected_edges;//bw;//detected_edges;///bw_;//rotated;//gba;//bw_;//rotated;
+        return  rgba;//tmpImg;//rgba;//binary_img;//rgba;//gr5ay_dst;//rgba;//tmpImg;//img_smeared;//binary_img;//rotated;//gba;//bw_1;//rgba;//otated;//gba;//otated;//erode_dst;//detected_edges;//bw;//detected_edges;///bw_;//rotated;//gba;//bw_;//rotated;
 //        mOpenCvCameraView.setFlashMode(this, 4);
 //        return ret;
     }
