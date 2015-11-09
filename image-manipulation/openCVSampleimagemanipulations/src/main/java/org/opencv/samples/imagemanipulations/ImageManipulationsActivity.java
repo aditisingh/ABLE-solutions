@@ -488,7 +488,7 @@ public class ImageManipulationsActivity extends Activity implements CvCameraView
         Log.d(TAG, "Focus measure"+focusMeasure);
 
         if (focusMeasure < 8) {
-            return rgba;
+//            return rgba;
         }
 
         gray.convertTo(gray, CvType.CV_32FC1);
@@ -569,83 +569,83 @@ public class ImageManipulationsActivity extends Activity implements CvCameraView
         ////////////////////////detecting text regions in the image/////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        // Smearing implementation
-        int T1 = cols/20;
-        int T2 = cols/10;
-        int count = 0;
-        int flag = 0;
-        Mat tmpImg = new Mat(binary_img.size(), CvType.CV_8UC1, new Scalar(0, 0, 0));
-        //doing row-wise
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < cols; j++) {
-                double[] data_curr = binary_img.get(i, j);
-                if (data_curr[0] == 255) {
-                    flag = 255;
-                    count = count + 1;
-                } else {
-                    if (flag == 255 && count <= T1) {
-                        for (int k = 0; k <= count; k++) {
-                            binary_img.put(i, j-k, 0);
-//                            binary_img.put(i, j + 1, 0);
-                        }
-                    }
-                    flag = 0;
-                    count = 0;
-                }
-            }
-        }
-
-
-        for (int j = 0; j < cols; j++) {
-            for (int i = 0; i < rows; i++) {
-                double[] data_curr = binary_img2.get(i, j);
-                if (data_curr[0] == 255) {
-                    flag = 255;
-                    count = count + 1;
-                } else {
-                    if (flag == 255 && count <= T2) {
-                        for (int k = 0; k <= count; k++) {
-                            binary_img2.put(i - k, j, 0);
-//                            binary_img2.put(i - k, j + 1, 0);
-                        }
-                    }
-                    flag = 0;
-                    count = 0;
-                }
-            }
-        }
+//        // Smearing implementation
+//        int T1 = cols/20;
+//        int T2 = cols/10;
+//        int count = 0;
+//        int flag = 0;
+//        Mat tmpImg = new Mat(binary_img.size(), CvType.CV_8UC1, new Scalar(0, 0, 0));
+//        //doing row-wise
+//        for (int i = 0; i < rows; i++) {
+//            for (int j = 0; j < cols; j++) {
+//                double[] data_curr = binary_img.get(i, j);
+//                if (data_curr[0] == 255) {
+//                    flag = 255;
+//                    count = count + 1;
+//                } else {
+//                    if (flag == 255 && count <= T1) {
+//                        for (int k = 0; k <= count; k++) {
+//                            binary_img.put(i, j-k, 0);
+////                            binary_img.put(i, j + 1, 0);
+//                        }
+//                    }
+//                    flag = 0;
+//                    count = 0;
+//                }
+//            }
+//        }
 //
 //
-        Core.bitwise_or(binary_img,binary_img2,tmpImg);
-        int MAX_KERNEL_LENGTH=7;
-        for(int k=1;k<MAX_KERNEL_LENGTH;k=k+2)
-        {
-            Imgproc.medianBlur(tmpImg,tmpImg,k);
-        }
-        List<MatOfPoint> contours = new ArrayList<MatOfPoint>();
-
-        Imgproc.findContours(tmpImg, contours, new Mat(), Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_SIMPLE);
-//        Imgproc.drawContours(rgba, contours, -1, new Scalar(0,0,255));
- for(int i=0; i< contours.size();i++) {
-     Rect rect = Imgproc.boundingRect(contours.get(i));
-     Imgproc.rectangle(rgba, rect.tl(), rect.br(), new Scalar(255, 0, 0));
-
-            RotatedRect rect_r;
-
-            Point[] rect1_points = new Point[4];
-            MatOfPoint2f mof = new MatOfPoint2f();
-            MatOfPoint2f mo2f = new MatOfPoint2f(contours.get(i).toArray());
-
-
-            rect_r = Imgproc.minAreaRect(mo2f);
-            rect_r.points(rect1_points);
-            mof.fromArray(rect1_points);
-            Scalar color = new Scalar(0, 255, 0);
-            Rect rr = rect_r.boundingRect();
-            Imgproc.rectangle(rgba, rr.tl(), rr.tl(), new Scalar(0,0,255));
-     for(int p=0;p<4;p++)
-                   Imgproc.line(rgba, rect1_points[p], rect1_points[(p + 1) % 4],color, 4);
- }
+//        for (int j = 0; j < cols; j++) {
+//            for (int i = 0; i < rows; i++) {
+//                double[] data_curr = binary_img2.get(i, j);
+//                if (data_curr[0] == 255) {
+//                    flag = 255;
+//                    count = count + 1;
+//                } else {
+//                    if (flag == 255 && count <= T2) {
+//                        for (int k = 0; k <= count; k++) {
+//                            binary_img2.put(i - k, j, 0);
+////                            binary_img2.put(i - k, j + 1, 0);
+//                        }
+//                    }
+//                    flag = 0;
+//                    count = 0;
+//                }
+//            }
+//        }
+//
+//
+//        Core.bitwise_or(binary_img,binary_img2,tmpImg);
+//        int MAX_KERNEL_LENGTH=7;
+//        for(int k=1;k<MAX_KERNEL_LENGTH;k=k+2)
+//        {
+//            Imgproc.medianBlur(tmpImg,tmpImg,k);
+//        }
+//        List<MatOfPoint> contours = new ArrayList<MatOfPoint>();
+//
+//        Imgproc.findContours(tmpImg, contours, new Mat(), Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_SIMPLE);
+////        Imgproc.drawContours(rgba, contours, -1, new Scalar(0,0,255));
+// for(int i=0; i< contours.size();i++) {
+//     Rect rect = Imgproc.boundingRect(contours.get(i));
+//     Imgproc.rectangle(rgba, rect.tl(), rect.br(), new Scalar(255, 0, 0));
+//
+//            RotatedRect rect_r;
+//
+//            Point[] rect1_points = new Point[4];
+//            MatOfPoint2f mof = new MatOfPoint2f();
+//            MatOfPoint2f mo2f = new MatOfPoint2f(contours.get(i).toArray());
+//
+//
+//            rect_r = Imgproc.minAreaRect(mo2f);
+//            rect_r.points(rect1_points);
+//            mof.fromArray(rect1_points);
+//            Scalar color = new Scalar(0, 255, 0);
+//            Rect rr = rect_r.boundingRect();
+//            Imgproc.rectangle(rgba, rr.tl(), rr.tl(), new Scalar(0,0,255));
+//     for(int p=0;p<4;p++)
+//                   Imgproc.line(rgba, rect1_points[p], rect1_points[(p + 1) % 4],color, 4);
+// }
 
 
 
@@ -685,22 +685,25 @@ public class ImageManipulationsActivity extends Activity implements CvCameraView
 //        }
 //
 ////                Log.d(TAG, "Warping");
-////        String filename = "test.bmp";
-////        File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), filename);
-//        _path = file.toString();
-////
-//        boolean out = Imgcodecs.imwrite(_path,rotated);//rgba);//rgba);
-//        Log.v(TAG, "Path " + _path);
-//        Log.v(TAG, "Result " + String.valueOf(out));
-//        Log.v(TAG, "State "+String.valueOf(Environment.getExternalStorageState()));
+        String filename = "test.bmp";
+        File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), filename);
+        _path = file.toString();
 //
-//        onPhotoTaken();
+        boolean out = Imgcodecs.imwrite(_path,binary_img);//rgba);//rgba);
+        Log.v(TAG, "Path " + _path);
+        Log.v(TAG, "Result " + String.valueOf(out));
+        Log.v(TAG, "State "+String.valueOf(Environment.getExternalStorageState()));
+
+        onPhotoTaken();
 
 //        return detected_edges;//rgba;//image;//dst;//rgba;//dst;//grad;//dst;//new_img;
-        return  rgba;//tmpImg;//rgba;//binary_img;//rgba;//gr5ay_dst;//rgba;//tmpImg;//img_smeared;//binary_img;//rotated;//gba;//bw_1;//rgba;//otated;//gba;//otated;//erode_dst;//detected_edges;//bw;//detected_edges;///bw_;//rotated;//gba;//bw_;//rotated;
+        return  binary_img;//tmpImg;//rgba;//binary_img;//rgba;//gr5ay_dst;//rgba;//tmpImg;//img_smeared;//binary_img;//rotated;//gba;//bw_1;//rgba;//otated;//gba;//otated;//erode_dst;//detected_edges;//bw;//detected_edges;///bw_;//rotated;//gba;//bw_;//rotated;
 //        mOpenCvCameraView.setFlashMode(this, 4);
 //        return ret;
     }
+
+
+
 
     private void writeToFile(File file, String data) {
         try {
